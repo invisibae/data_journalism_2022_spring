@@ -1,0 +1,104 @@
+---
+title: "lab_02"
+author: "Greg Morton"
+date: "2/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## About this lab
+
+To complete this lab, you need to:
+* run existing code as directed (look for **Task**).
+* modify existing code as directed (look for **Task**).
+* write code in empty codeblocks provided to answer questions included (look for **Q**).
+* write out the answer in the form of a complete sentence in the space given (look for **A**).
+
+When you are finished, commit changes and push to your personal GitHub repo, then submit the URL to this document on ELMS.
+
+## Load libraries and establish settings
+
+**Task** Run the codeblock below to load the Tidyverse and Lubridate. To run the codeblock, hit the little green play button in the upper right corner of the gray area (the codeblock) below.
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse and lubridate
+library(tidyverse)
+library(lubridate)
+```
+
+## Load Data
+
+Let's keep working with West Virginia loans contained in the PPP loans data.  
+
+**Task** Run the codeblock below to load the data.
+
+```{r}
+west_virginia_ppp <- read_rds("data/lab_02.rds")
+```
+
+## Examine Data
+
+## Answer questions
+
+**Q1** Create a new column that divides the loan amounts into the following options - under_10k, 10k_50k, 50k_100k, 100k_500k, 500k_1m, 1m_plus - and calculates how many loans are in each group. How would you describe the distribution of loans in a sentence?
+Hint: You will need to use `case_when` to make this work.
+**A1**: **The distribution is positively skewed, meaning most of the loans are on the low end (between >10 and 100k) and the number of loans decreases as the amount goes higher**
+
+```{r}
+west_virginia_ppp %>%
+  mutate(loan_cat = case_when(amount < 10000 ~ "under_10k",
+                              amount >= 10000 & amount < 50000 ~ "10k_50k",
+                              amount >= 50000 & amount < 100000 ~ "50k_100k",
+                              amount >= 100000 & amount < 500000 ~ "100k_500k",
+                              amount >= 500000 & amount < 1000000 ~ "500k_1m",
+                              amount >= 1000000 ~"1m_plus"))  %>%
+  group_by(loan_cat) %>%
+  summarize(count =n()) %>%
+  arrange(desc(count))
+```
+
+**Q2** Some of the loans appear not to have been paid out - there is a column representing the amount of money that hasn't been disbursed to the applicant. Which servicing lenders have the most loans with undisbursed amounts greater than 0?
+**A2**: **Davis Trust Company and Miners & Merchants Bank**
+
+```{r}
+west_virginia_ppp %>%
+  filter(undisbursed_amount > 0) %>%
+  select(lender, undisbursed_amount) %>%
+  group_by(lender) %>%
+  summarize(count = n())
+
+```
+
+**Q3** What are some potential reasons why a loan might not be paid out? What questions does that circumstance raise for you?
+**A3**: **These loans could've been flagged as fraudulent after being approved by the lender, as the fintech companies in the NYT article allege they often did**
+
+
+**Q4** Which month in 2021 had the most loans approved?
+**A4**: **April 2020**
+
+```{r}
+west_virginia_ppp %>%
+  mutate(Month = floor_date(date_approved, "month")) %>%
+  group_by(Month) %>%
+  summarise(total = n()) %>%
+  arrange(desc(total))
+
+```
+
+**Q5** How many loans went to West Virginia applicants that listed the maximum number of jobs retained (500)? Which one had the earliest approved date?
+**A5**: **10 companies lsited the maximum number of jobs retained.  
+
+```{r}
+west_virginia_ppp %>%
+  filter(jobs_retained >= 500) %>%
+  select(name, jobs_retained, date_approved) %>%
+  arrange(date_approved)
+
+```
