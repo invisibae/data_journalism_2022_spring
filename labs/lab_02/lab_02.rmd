@@ -60,7 +60,7 @@ west_virginia_ppp %>%
                               amount >= 500000 & amount < 1000000 ~ "500k_1m",
                               amount >= 1000000 ~"1m_plus"))  %>%
   group_by(loan_cat) %>%
-  summarize(count =n()) %>%
+  summarize(count = n()) %>%
   arrange(desc(count))
 ```
 
@@ -70,8 +70,8 @@ west_virginia_ppp %>%
 ```{r}
 west_virginia_ppp %>%
   filter(undisbursed_amount > 0) %>%
-  select(lender, undisbursed_amount) %>%
-  group_by(lender) %>%
+  select(servicing_lender_name, undisbursed_amount) %>%
+  group_by(servicing_lender_name) %>%
   summarize(count = n())
 
 ```
@@ -93,7 +93,7 @@ west_virginia_ppp %>%
 ```
 
 **Q5** How many loans went to West Virginia applicants that listed the maximum number of jobs retained (500)? Which one had the earliest approved date?
-**A5**: **10 companies lsited the maximum number of jobs retained.  
+**A5**: **10 companies lsited the maximum number of jobs retained.**  
 
 ```{r}
 west_virginia_ppp %>%

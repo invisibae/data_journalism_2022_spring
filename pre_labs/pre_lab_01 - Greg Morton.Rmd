@@ -224,4 +224,4 @@ ppp_maryland_loans %>%
 
 How many companies got $10 million loans? One of them is a restaurant chain.  What kind of food do they serve? Put your answers in the space below.
 
-**Answer**: 5 companies got $10 million loans including jingoistic College Park BBQ staple Mission BBQ
+**Answer**: 5 companies got $10 million loans including jingoistic College Park BBQ staple Mission BBQ.
