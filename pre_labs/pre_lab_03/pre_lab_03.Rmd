@@ -290,7 +290,7 @@ cleaned_arnold_md_loans
 ```
 ### Task 10: Try again to summarize the amount column
 **Task** Run the following codeblock to add up the amount of all loans in this data.  What is the total? Answer below.
-**Answer**: **2033179**
+**Answer**: **$2,033,179**
 ```{r}
 # cleaning function
 total_arnold_md_loans <- cleaned_arnold_md_loans %>%
