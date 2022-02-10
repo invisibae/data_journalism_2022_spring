@@ -383,6 +383,7 @@ cleaned_arnold_md_loans <- arnold_md_loans %>%
   mutate(city = str_to_title(city)) %>%
   mutate(city = case_when(
     city == "Anold" ~ "Arnold",
+    city == "Arnld" ~ "Arnold",
     TRUE ~ city
   ))
 
