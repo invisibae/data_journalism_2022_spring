@@ -48,8 +48,19 @@ wv_ppp_loans %>%
 #  * What percentage of the total loan amount have been forgiven?
 #  * How did the U.S. House member vote on the legislation initially author zing the PPP loan program.
 
+wv_ppp_loans %>% 
+  filter(str_detect(.$name, c("DUTCH MILLER", "DM MOTORS" )))
+
+
 wv_ppp_loans %>%
-  select(str_detect)
+  filter(str_detect(name, "DUTCH MILLER|DM MOTOR, INC")) %>%
+  select(name, amount, forgiveness_amount) %>%
+  mutate(forgiveness_pct = forgiveness_amount / amount, total = sum(amount))
+
+
+
+
+
   
 
    
