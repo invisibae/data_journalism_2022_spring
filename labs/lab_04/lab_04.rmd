@@ -143,7 +143,7 @@ maryland_ppp_final %>%
 ```{r}
 maryland_ppp_final %>%
   filter(PNHA == 0) %>%
-  filter(race == "Asian")
+  filter(race == "Asian") 
 
 maryland_ppp_final %>%
   filter(PNHA == 0) %>%

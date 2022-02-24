@@ -1,3 +1,14 @@
+options(scipen=999)
+
+# Load the tidyverse here
+library(tidyverse)
+# Load janitor here
+library(janitor)
+
+setwd("/Users/gregorymorton/Documents/GitHub/data_journalism_2022_spring/labs/lab_03")
+wv_ppp_loans <- read_rds("lab_03.rds")
+
+
 
 # Q1
 wv_ppp_loans %>%
@@ -49,7 +60,7 @@ wv_ppp_loans %>%
 #  * How did the U.S. House member vote on the legislation initially author zing the PPP loan program.
 
 wv_ppp_loans %>% 
-  filter(str_detect(.$name, c("DUTCH MILLER", "DM MOTORS" )))
+  filter(str_detect(name, c("DUTCH MILLER", "DM MOTORS" )))
 
 
 wv_ppp_loans %>%
