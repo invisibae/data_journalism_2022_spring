@@ -95,7 +95,7 @@ Let's write a bit of code to tell R to go to the URL for the page and ingest all
 
 ### Task 5: Run code to read in html
 **Task** Run the following code to read in the html. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **A list that seperates out the main elements of the html page (<head> and <body>) into two different lists containing their contents**
 
 ```{r}
 # read in the html
@@ -147,7 +147,7 @@ Because it's inside of a table, and not some other kind of element (like a `<div
 
 ### Task 10: Run code to process tables
 **Task** Run the following code to process tables. Briefly describe the output that appears below the codeblock.
-**Answer**: **unfortunately it scrapes *every* html table on the page.  So we get table of tables.**
+**Answer**: **unfortunately it scrapes *every* html table on the page.  So we get a table of tables.**
 
 ```{r}
 # read in the html and extract all the tables
@@ -156,7 +156,7 @@ naics_industry <- naics_url %>%
   html_table()
 
 # display the tables below
-naics_industry
+naics_industry 
 
 ```
 
@@ -166,7 +166,7 @@ Click on it to open it up.
 
 ### Task 11: Inspect naics_industry.
 **Task** Follow the directions in the previous paragraph. Briefly describe what you see there.
-**Answer**
+**Answer**: **a "dataframe of dataframes".  The second item is the dataframe of naics sector codes taht we're actually looking for**
 
 It should look like this.
 
@@ -185,7 +185,7 @@ Click on the scroll icon for the first dataframe examine it.
 
 ### Task 13: Click scroll icon
 **Task** Follow the directions in the previous paragraphs. Briefly describe what you see there.
-**Answer**
+**Answer**: **empty df**
 
 ### Task 14: Load image
 **Task** Run the following code to display an image showing what you should see when you follow the steps in task 13.
@@ -200,7 +200,7 @@ Let's try clicking on the scroll icon for row 2.
 
 ### Task 15: Click scroll icon
 **Task** Follow the directions in the previous paragraph. Briefly describe what you see there.
-**Answer**
+**Answer**: **naics sector code and description**
 
 ### Task 16: Load image
 **Task** **Task** Run the following code to display an image showing what you should see when you follow the steps in task 15.
@@ -213,7 +213,7 @@ That's more like it! So, all we need to do now is to store that single dataframe
 
 ### Task 17: Run code to keep only table we want
 **Task** Run the following code to keep only the table we want. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **voila, only the table we want**
 
 ```{r}
 # Read in all html from table, store all tables on page as nested list of dataframes.
@@ -237,7 +237,7 @@ From here, we can do a little light cleaning. Let's use clean_names() to standar
 
 ### Task 18: Run code to do some light cleaning
 **Task** Run the following code to do light cleaning. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer** **lop off the summary column at the end of the table with the slice function**
 
 ```{r}
 # Read in all html from table, store all tables on page as nested list of dataframes.
@@ -284,7 +284,7 @@ Now, let's run the code we wrote in the last chapter, to get a tidy list of NAIC
 
 ### Task 2: Run code to load the table from the last chapter
 **Task** Run the following code to load table from last chapter. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer** **the same two column data frame containing naics sector code and a description of that sector**
 ```{r}
 # Define url of page we want to scrape
 
@@ -324,7 +324,7 @@ We can find it here: [https://www.bls.gov/iag/tgs/iag22.htm](https://www.bls.gov
 
 ### Task 4: Go to the web page linked above
 **Task** Visit the web page linked above. Briefly describe what you see there.
-**Answer**
+**Answer**: **various data on the utlities sect**
 
 A few scrolls down the page, there's a table that has employee statistics.  
 
@@ -359,7 +359,7 @@ Next, let's read in the html of that page, and store it as an object called empl
 
 ### Task 7: Run code to read in html
 **Task** Run the following code to read in the html. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **another list of two containing each of the main html page elements**
 
 ```{r}
 
@@ -400,7 +400,7 @@ But essentially what the html_element function says is "find the html element th
 
 ### Task 9: Run code to get html_element with info we need
 **Task** Run the following code to get html_element with info we need. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **The html code for the tabe on the page**
 
 ```{r}
 
@@ -480,13 +480,13 @@ The info for mining is on this page: [https://www.bls.gov/iag/tgs/iag21.htm](htt
 
 ### Task 12: Go to the web page linked above
 **Task** Visit the web page linked above. Briefly describe what you see there.
-**Answer**
+**Answer**: **The same kind of workforce statistics page but for mining, quarrying, and oil and gas extraction**
 
 The info for construction is on this page: [https://www.bls.gov/iag/tgs/iag23.htm](https://www.bls.gov/iag/tgs/iag23.htm).
 
 ### Task 13: Go to the web page linked above
 **Task** Visit the web page linked above. Briefly describe what you see there.
-**Answer**
+**Answer**: **workforce stats for the construction industry**
 
 We have 20 sectors to get through.  
 
@@ -513,7 +513,7 @@ First, let's do it the repetitive way.  We're writing the same print function ov
 
 ### Task 14: Run code to print sectors
 **Task** Run the following code to print sectors. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **function "print()" prints each string as we run each line of code**
 ```{r}
 
 print("Agriculture, Forestry, Fishing and Hunting")
@@ -557,6 +557,17 @@ list_of_sectors <- c("Agriculture, Forestry, Fishing and Hunting", "Mining, Quar
 # Make a for loop and run it
 for (sector in list_of_sectors) {
   print(sector)
+  
+# Make url
+sector_url = paste0() 
+
+#scrape url into html
+  
+#find a specific table 
+  
+# extract one row (the second row) from that table 
+  
+  
 }
 
 
@@ -572,7 +583,7 @@ If we try to feed it something different -- say "sector_list" -- it won't work, 
 
 ### Task 17: Run code to use for loop to print sectors that errors
 **Task** Run the following code to use a for loop to print list of sectors that errors. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **function assigns a name to each sector list item ("sector") prints each item**
 
 ```{r, error=TRUE}
 # Define list of sectors
@@ -580,7 +591,7 @@ list_of_sectors <- c("Agriculture, Forestry, Fishing and Hunting", "Mining, Quar
 "Wholesale Trade", "Retail Trade", "Transportation and Warehousing", "Information", "Finance and Insurance")
 
 # For loop that refers to a list that doesn't exist!  
-for (sector in sector_list) {
+for (sector in list_of_sectors) {
   print(sector)
 }
 
@@ -597,7 +608,7 @@ To illustrate this, note that the code works just fine if we change it to say th
 
 ### Task 18: Run code to use for loop to print sectors
 **Task** Run the following code to use a for loop to print list of sectors. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **same thing.  It doesn't matter what we call "___ in list_of_sectors"**
 ```{r}
 # Define list of sectors
 list_of_sectors <- c("Agriculture, Forestry, Fishing and Hunting", "Mining, Quarrying, and Oil and Gas Extraction", "Utilities", "Construction", "Manufacturing",
@@ -617,7 +628,7 @@ In this code below, it has no idea what we mean by "sector_name", because we hav
 
 ### Task 19: Run code to use for loop to print sectors that errors
 **Task** Run the following code to use a for loop to print list of sectors. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **we error out before we never define 'sector name' within the function**
 ```{r, error=TRUE}
 # Define list of sectors
 list_of_sectors <- c("Agriculture, Forestry, Fishing and Hunting", "Mining, Quarrying, and Oil and Gas Extraction", "Utilities", "Construction", "Manufacturing",
@@ -637,7 +648,7 @@ The code below says: "for each number in a range of numbers from 1 to 10, print 
 
 ### Task 20: Run code to use for loop to print 1 to 10
 **Task** Run the following code to use a for loop to print 1 to 10. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **assigns the numbers in this array a name ('number') and prints each number**
 ```{r}
 # For loop that includes instructions that refer to a variable that doesn't exist.
 for (number in 1:10) {
@@ -652,7 +663,7 @@ Instead of giving the for loop an explicit number range, like 1:10, we can tell 
 Remember the naics_industry dataframe we loaded first? It has 20 rows.
 ### Task 21: Run code to display naics_industry
 **Task** Run the following code to display naics_industry. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **naics sector code and a brief description of the sector**
 
 ```{r}
 
@@ -664,7 +675,7 @@ We can use that information in our for loop by using the nrow() function, which 
 
 ### Task 22: Run code to display number of rows in naics_industry
 **Task** Run the following code to display number of rows naics_industry. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **number of rows in the 'naics_industry' dataframe**
 
 ```{r}
 nrow(naics_industry)
@@ -674,7 +685,7 @@ To put it all together, the code below says "make a list of numbers that starts 
 
 ### Task 23: Run code to print each row number in naics_industry
 **Task** Run the following code to to print each row number in naics_industry. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: first line creates an array that spans 1-20 and assigns the numbers in that array a name ('row_number').  The second line prints each 'row number'
 
 ```{r}
 # For loop that includes instructions that refer to a variable that doesn't exist.
@@ -691,7 +702,7 @@ First, let's look at the codeblock we wrote earlier to extract the number of emp
 
 ### Task 24: Run code to load table from earlier
 **Task** Run the following code to load table from earlier. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **employment in an industry as of November 2022**
 
 ```{r}
 
@@ -718,7 +729,7 @@ This contains all the steps we needed to extract the information from one sector
 First, we need to build a list of URLs to loop through in a "for loop." We can do that using the dataframe we made in the last chapter.
 ### Task 25: Run code to load the table from the last chapter
 **Task** Run the following code to load table from last chapter. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **a sector code and description**
 ```{r}
 # Define url of page we want to scrape
 
@@ -758,7 +769,7 @@ We're going to use mutate() and paste0() to concatenate (mash together) the thin
 
 ### Task 26: Run code to build url
 **Task** Run the following code to build url. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **we've added an additional column to display the url containing employment data for each industry in our 'naics_industry' talbe**
 
 ```{r}
 
@@ -780,7 +791,7 @@ On the Utilities page (sector code 22), the ID for the table we want is "iag22em
 
 ### Task 27: Run code to build id
 **Task** Run the following code to build id. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **builds the xpath for each sector based on naics**
 
 ```{r}
 
@@ -820,7 +831,7 @@ We get 19 dataframes, each with one row, one for each sector.
 
 ### Task 29: Run code to run for loop and keep one row
 **Task** Run the following for loop and keep one row. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **outputs each row each sector as its own seperate df object**
 
 ```{r}
 
@@ -852,7 +863,7 @@ To see how this is working, we're going to edit our print statement at the end a
 
 ### Task 30: Run code to run for loop to store url and xpath value
 **Task** Run the following for loop to store url and xpath value. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **spits out a url and xpath for each item in 'naics_industry'**
 ```{r}
 
 # For loop, iterating over each row in our naics industry dataframe
@@ -885,7 +896,7 @@ So, when you run this code, it will print out 19 dataframes inside of nested lis
 
 ### Task 31: Run code to run for loop to get tables
 **Task** Run the following for loop to get tables. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **19 beautiful dataframes.  We have successfully scraped the employment statistics table from each version of the page**
 
 ```{r}
 
@@ -919,7 +930,7 @@ In this next step, we use employment_info <- employment_info[[1]]  to extract ea
 
 ### Task 32: Run code to run for loop to clean up tables
 **Task** Run the following for loop to clean up tables. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **simplifies our dataframes and cleans up their names.  We keep only Employment (all employees)**
 
 ```{r}
 
@@ -960,7 +971,7 @@ We can add that back in by using bind_cols() to reconnect the each_row_df, which
 
 ### Task 33: Run code to run for loop to add in data
 **Task** Run the following for loop to add in data. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **returns relevant variables like URL, xpath, and description to our df**
 
 ```{r}
 
@@ -1002,7 +1013,7 @@ Let's use parse_number() to remove the comma from the jun_2021 number and conver
 
 ### Task 34: Run code to run for loop to clean up tables
 **Task** Run the following for loop to clean up tables. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **a little bit of column name cleanup and converting the employment number from November to a numeric value so that we are able to transform and analyze it**
 
 ```{r}
 
@@ -1055,7 +1066,7 @@ And inside our "for loop" at the end, we'll bind each employment_info dataframe 
 
 ### Task 35: Run code to run for loop to combine tables into a single table
 **Task** Run the following for loop combine tables into a single table. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **starts by creating an empty tibble, then runs our completed loop and puts our combined dataframes into the empty tibble we created at the beginning**
 
 ```{r}
 
@@ -1112,7 +1123,7 @@ Here's the table on the mining sector page: [https://www.bls.gov/iag/tgs/iag21.h
 
 ### Task 36: Go to the web page linked above
 **Task** Visit the web page linked above. Briefly describe what you see there.
-**Answer**
+**Answer**: **employment info on the mining sector**
 
 ### Task 37: Load image
 **Task** Run the following code to display an image showing what you should see on the web page.
@@ -1126,7 +1137,7 @@ And here's the table for the agriculture sector.
 
 ### Task 38: Go to the web page linked above
 **Task** Visit the web page linked above. Briefly describe what you see there.
-**Answer**
+**Answer**: **missing overall employment.  Only gives unemployment, and as a % at that**
 
 ### Task 39: Load image
 **Task** Run the following code to display an image showing what you should see on the web page.
@@ -1140,7 +1151,7 @@ In the second row of this table, it has the unemployment rate. Nowhere on the pa
 
 ### Task 40: Run code to remove agriculture from table
 **Task** Run the following code to remove agriculture from table. Briefly describe the output that appears below the codeblock.
-**Answer**
+**Answer**: **Agriculture remains on the table, but its total employment is chagned to an NA value so as not to mess up any conclusions we might draw from the data**
 
 ```{r}
 # remove the suspicious value for agriculture.
