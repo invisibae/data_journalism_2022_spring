@@ -142,7 +142,7 @@ for(row_number in 1:nrow(test)) {
 
 }
 
-state_ppp_final %>%
+state_ppp_final<- state_ppp_final %>%
   mutate(ppp_per_100k = (total_ppp_loans / population)*100000) %>%
   arrange(desc(ppp_per_100k))
 
