@@ -1,6 +1,6 @@
 ---
 title: "pre_lab_08.Rmd"
-author: "derek willis"
+author: "Greg Morton"
 date: "8/26/2021"
 output: html_document
 ---
@@ -113,7 +113,7 @@ alldata %>% mutate(change = ((Population2010-Population2000)/Population2000)*100
 You may be asking: hey, wasn't there a 2020 Census? Where's that data? The answer is that it's coming - the Census Bureau has a [schedule of releases](https://www.census.gov/programs-surveys/popest/about/schedule.html). There are some variables available:
 
 ```{r}
-pl <- load_variables(2020, "pl") 
+pl <- load_variables(2020, "pl")
 
 View(pl)
 ```
