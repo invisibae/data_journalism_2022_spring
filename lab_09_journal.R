@@ -14,3 +14,26 @@ state_ppp_all %>%
                            
   )) 
 
+
+
+barber_shops %>%
+  colnames()
+
+barber_shops %>%
+  group_by(race) %>%
+  summarise(count = n(),
+            mean_amount = mean(amount, na.rm = T),
+            mean_undisp_amount = mean(undisbursed_amount, na.rm = T)) %>%
+  arrange(desc(mean_amount))
+
+barber_shops$jobs_retained %>%
+  quantile()
+
+barber_shops   %>%
+  group_by(rural_urban_indicator) %>%
+  summarise(count = n(),
+            mean_amount = mean(amount, na.rm = T),
+            mean_undisp_amount = mean(undisbursed_amount, na.rm = T)) %>%
+  arrange(desc(mean_amount))
+
+

@@ -460,8 +460,8 @@ So let's change the color scale to a "log" scale, which will help us see those d
 **Answer**
 
 ```{r}
-ggplot() + 
-  geom_sf(data=md_beds_per_100k, aes(fill=beds_per_100k)) + 
+ggplot() +
+  geom_sf(data=wv_mining_per_100k, aes(fill=loans_per_100k, geometry = geometry)) +
   theme_minimal() +
   scale_fill_viridis_b(option="magma",trans = "log") 
 ```

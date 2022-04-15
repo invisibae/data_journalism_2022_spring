@@ -192,7 +192,7 @@ maryland_ppp_top_counties %>%
   geom_bar(aes(x=reorder(project_county_name,total_loans), weight=total_loans)) +
   coord_flip() + 
   theme_economist() +
-  scale_y_continuous(labels = comma) +
+v  scale_y_continuous(labels = comma) +
   labs(
     title="Maryland Counties with Most PPP Loans\n",
     x = "total loans\n",
