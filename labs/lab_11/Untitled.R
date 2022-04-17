@@ -6,3 +6,4 @@ wv_mining_locations <- st_read("data/wv.shp")
 
 
 
+wv_mining_
