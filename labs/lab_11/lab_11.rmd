@@ -119,7 +119,7 @@ wv_mining_per_100k %>%
 
 **A1.**
 
-=
+
 
 **Q2.** You want to understand WHY the spatial pattern you saw above exists.  So you grab a shapefile with the latitude and longitude coordinates of every mine permit in West Virginia from the state Department of Environmental Protection.
 
