@@ -1,0 +1,107 @@
+---
+title: "Comic Book Journal"
+output: html_notebook
+---
+
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(janitor)
+library(rvest)
+library(glue)
+library(purrr)
+library(tibble)
+```
+## Okay What Do I Do?
+
+The commic book data provides a few interesting ideas.  
+
+The original piece this data was used for is about the evolution of representation of gender and sexuality over the years in Marvel and DC comics.
+
+I'll try not to repeat this idea, but in doing so I run into my first problem: 
+
+### Problem 1: The Variables are a Bit Dull
+
+If I'm going to go in a different direction, the variables aren't the best.  They give me a nice starting point, but I'm going to have to do a little more work if I want to do some original analysis.  
+
+Stuff like "ALIGN" (whether the character is good or evil), "APPEARANCES", "YEAR" (year of first appearance), "SEX", and "name" could prove to be valuable, but the biggest gift from this dataset is the "slug" variable, which should give me an easy way to use rvest to iterate through characters' URLs to look for more more interesting variables.
+
+```{r}
+dc_data <- read_csv("data/dc-wikia-data.csv")
+
+marvel_data <- read_csv("data/marvel-wikia-data.csv")
+
+dc_data %>%
+  colnames()
+```
+
+Let's create a new dataframe with a "full_url" column 
+
+```{r}
+
+dc_url <- "https://dc.fandom.com"
+
+dc_test <- dc_data %>%
+  mutate(slug = gsub("([\\])","", dc_data$urlslug)) %>%
+  select(name, slug) %>%
+  mutate(full_url = paste0(dc_url, slug))
+
+
+```
+
+
+## My First Idea: What Do Superheroes Do When They're Not Being Superheroes?
+
+One of the variables that caught my eye early (after I spent a few minutes musing on whether height and weight was enough to assemble a superhero basketball team for each universe) was the "occupation" field listed on many of the superhero wikia pages.  
+
+I found this a really interesting for a few reasons:
+
+1) It's an easy way of ascribing class to comic book characters. Class isn't something that's mentioned all that often in comic books (at least as far as I know).  Part of the reason superheroes inspire so many of us is because superpowers remove resources as a constraint on potential.  Superheroes can often punch and kick their way out of problems that would be far more complicated for normal people.  But it makes me wonder, is there a clear distinction of classes among superheroes?  Are there poor superheroes?  Are more villains poor?  
+
+2) It gives a character additional depth.  Spider-Man is a wonderful example of this.  He is a more effective character because he is a normal person who we often see going to school and working jobs.  We see the personal sacrifices Peter Parker makes in terms of his time and responsibilities to fight crime, so each time he bolts out of a room to suit up, it feels impactful because we can all relate to that kind of sacrifice.  
+
+3) How many jobs can you work and still fight crime: One of the first things I noticed was that many characters had multiple jobs.  It made me wonder about the typical time commitment for superhero activities.  
+
+### So tons of interesting questions to answer 
+
+and I'm super I'll come up with more but the next step here is to figure out all these characters' jobs which led me to problem 2
+
+
+### Problem 2: The job getting function
+
+The following function produces a list of jobs scraped from dc wikia for the first 200 characters on the dc list.  
+
+It's not 100% perfect but I was pleasantly surprised by the results given the fairly generic html node 
+
+First I'll talk about the problems (most of which seem pretty solvable):
+
+First, the obvious: there are about ~30 characters missing an occupation field.  For some it is because the node is a bit different, for some the url generated from the "urlslug" field returned a 404.  I'll examine those more closely this week, but the relatively small number makes me a little less averse to doing those by hand
+
+Second, some of the results seem to be from a different field.  Not sure how many of these (although it doesn't seem to be many) look to be marital statuses.  Not 100% surprised given marital status is generally close to occupation on the page but still a bit disappointed nonetheless 
+
+Third, there's still some work to be done standardizing the field.  Some jobs are separated by ".", while some are separated by ",".  
+
+Anyways, I think I'm off to a good start here and the work this week will mostly revolve around refining the scraping function and then hopefully jumping into some analysis
+
+```{r}
+
+page<- (dc_test$full_url[1:200])
+
+
+
+gdxg <- lapply(page, function(i) {
+  
+ tryCatch(
+  i %>%
+    read_html %>%
+    html_nodes(".pi-item-spacing+ .pi-border-color .pi-border-color:nth-child(6) .pi-font") %>% 
+    html_text(),
+  error = function(e){NA}  
+ )
+})
+
+
+```
