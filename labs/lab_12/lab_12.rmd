@@ -69,14 +69,28 @@ wvu_crime <- wvu_crime %>%
 ```
 3. Generate a dataframe of the most recent date's incidents.
 ```{r}
-wvu_crime %>%
-  filter(date == max(date))
+wvu_crime_today <- wvu_crime %>%
+  filter(date == max(date)) 
 
 ```
 4. Using the first title in that dataframe, find the number of incidents that occurred in the previous 30 days and write out a sentence using paste. The sentence should include the most recent date, the title of the incident and the number of times that kind of incident has occurred in the previous 30 days.
 ```{r}
 today <- wvu_crime %>%
   filter(date == max(date))
+
+today_crime <- wvu_crime %>%
+  filter(date == max(date)) %>% 
+  select(title) %>% 
+  head(1) %>% 
+  unlist %>%
+  as.vector() 
+
+today_crime_lower <- today_crime  %>% 
+  str_to_lower()
+
+today_crime_title <- today_crime  %>% 
+  str_to_title()
+
 
 today_count <- today %>%
   count() %>%
@@ -89,34 +103,54 @@ today_count <- today %>%
 
 
 last_month <- wvu_crime %>%
-  filter(date == max(date) - 30) 
+  filter(date >= max(date) - 30) 
+
+last_month_today <- wvu_crime %>%
+  filter(date == max(date) - 30) %>% 
+  count() %>%
+  unlist() %>%
+  as.vector() 
+
+
 
 last_month_count <- last_month %>%
   count() %>%
   unlist() %>%
   as.vector() 
 
+last_month_count <- last_month %>%
+  count() %>%
+  unlist() %>%
+  as.vector() 
+
+last_month_crime_count <- last_month %>%
+  filter(title == today_crime) %>%
+  count() %>%
+  unlist() %>%
+  as.vector() 
+
 test <- case_when(
-  today_count > last_month_count ~ print("an increase"),
-  today_count < last_month_count ~ print("a decrease"),
-  today_count == last_month_count ~ print("incidents remained steady"),
+  today_count > last_month_today ~ print("an increase"),
+  today_count < last_month_today ~ print("a decrease"),
+  today_count == last_month_today ~ print("incidents remained steady"),
   TRUE ~ print("error")
 )
 
 test2 <- case_when(
-  today_count > last_month_count ~ print("of"),
-  today_count < last_month_count ~ print("of"),
-  today_count == last_month_count ~ print("at"),
+  today_count > last_month_today ~ print("of"),
+  today_count < last_month_today ~ print("of"),
+  today_count == last_month_today ~ print("at"),
   TRUE ~ print("error")
 )
 
 test3 <- today$date %>%
   head(1)
 
-pct_change <- paste0(((today_count - last_month_count) / last_month_count), "%")
+test3 <- format.Date(test3, format = "%B %d, %Y")
 
-wvu_crime_statement <- paste("On",today$date %>%
-  head(1) ,paste0(today_count, ","),"crimes were reported at WVU.","Crime this month", test, test2, pct_change,"from", last_month_count, "30 days before")
+pct_change <- paste0(((today_count - last_month_today) / last_month_today) * 100, "%")
+
+
 
 
 
@@ -128,10 +162,10 @@ wvu_crime_statement <- paste("On",today$date %>%
 
 Put your sentence in the answer below, along with one other question you could ask of this data.
 
-**A1.**
+**A1.**: **I added month over month percentage change, but I'd also be interested into knowing percentage breakdown of reported incidents month to month**
 
 ```{r}
-wvu_crime_statement <- paste("On", paste0(test3, ","),today_count,"incidents were reported at WVU.","This represents",test, test2, pct_change,"from", last_month_count,"reported incidents", "30 days before")
+wvu_crime_statement <- paste("On", paste0(test3, ","),today_count,"incidents were reported at WVU including",paste0("'",today_crime_lower,"'", "."),"This represents",test, test2, pct_change,"from", last_month_today,"reported incidents", "30 days before.", paste0("'",today_crime_title,"'"), "has been reported", last_month_crime_count, "times in the last 30 days.")
 
 wvu_crime_statement
 ```
@@ -141,8 +175,74 @@ wvu_crime_statement
 
 ```{r}
 
+zip_vaxx <- read_csv("https://raw.githubusercontent.com/state-of-maryland/VaccineCSVs/master/Vax_ZIP_CODE_FirstSecondSingle_Totals_Raw.csv")
 
+full_zips <- zip_vaxx %>%
+  filter(nchar(ZIP_CODE) == 5) 
+
+
+full_zips$ZIP_CODE <- full_zips$ZIP_CODE %>% as.character()
+
+full_zips <- full_zips %>%
+  rename(zip = ZIP_CODE) 
+
+
+
+md_rough <- read_csv("data/md_zips_rough.csv")
+
+md_zips_test <- get_acs(geography = "zcta", 
+        variables = c(population = "B01001_001"), 
+        state = "MD") %>%
+    rename(population = estimate,
+         zip = GEOID) %>%
+  select(zip)
+
+md_rough$zip <- md_rough$zip %>% as.character
+
+md_vaxx <- md_zips_testh %>%
+  left_join(full_zips, by = "zip")
+
+md_all_zips <- md_rough %>%
+  select(zip)
+
+
+non_md_zips <- full_zips %>% 
+  anti_join(md_all_zips,by = "zip")
+
+date <- now() %>%
+  as.Date()
+
+md_save <- paste0("data/maryland_zips",date,".csv")
+
+non_md_save <- paste0("data/non_maryland_zips",date,".csv")
+
+non_md_vaxx <- non_md_zips %>% 
+  filter(!is.na(FullyVaccinated))
+
+md_vaxx %>% 
+  filter(!is.na(FullyVaccinated))
+
+md_most_vaxxed <- md_vaxx %>%
+  arrange(desc(FullyVaccinated)) %>%
+  head(25)
+
+md_least_vaxxed <- md_vaxx %>% 
+  arrange(FullyVaccinated) %>%
+  head(25)
+
+non_md_most_vaxxed <- non_md_vaxx %>% 
+  arrange(FullyVaccinated) %>%
+  head(25)
+
+non_md_least_vaxxed <- non_md_vaxx %>% 
+  arrange(FullyVaccinated) %>%
+  head(25)
+
+
+
+md_most_vaxxed
 ```
+
 
 Maryland zips: maryland_zips_yyyymmdd.csv
 Non-Maryland zips: non_maryland_zips_yyyymmdd.csv
@@ -157,9 +257,14 @@ To do that, you will need to:
 
 Google the top 2-3 zip codes from both Maryland and non-Maryland results and describe them in your answer.
 
-**A2.**
+**A2.**: **7 of the top 10 are all Montgomery County, makes since because it is near DC and a lot of people live and work there**
 
 ```{r}
+
+write_csv(md_most_vaxxed, md_save)
+
+write_csv(non_md_most_vaxxed, non_md_save)
+
 ```
 
 **Q3.** Maryland has had one of the more successful vaccination rates, but you want to understand where a significant portion of the population remains less than fully vaccinated. Make a dataframe of all Maryland zip codes from the vaccination data you used in Q2 and join it to Maryland zip code population data from the Census API. Calculate the percentage of fully vaccinated for each zip code and then make a map showing the zip codes with less than 50 percent fully vaccinated. Put a blank map with the outline of Maryland counties (which you can get from Tigris) behind it for context. Add a label to the map describing what the data is and include the date from the vaccination data (programmatically, so you can run it every day).
@@ -168,7 +273,47 @@ You WILL need to ensure that the columns you use to join the two dataframes are 
 
 Describe the output of the map below, and say what you think the most interesting areas are.
 
-**A3.**
+**A3.**: **This is actually very, very cool.  There's a pattern of zip codes at Maryland's margins having some of the lowest rates of full vaccination in the state.  This suggests that people may be getting 1 or both doses either at more central areas in the state or out of state (or a mix of both)**
 
 ```{r}
+
+md_zip_pop <- get_acs(geography = "zcta", 
+        variables = c(population = "B01001_001"), 
+        state = "MD", 
+        geometry = T) 
+
+
+  
+
+md_zip_pop <- md_zip_pop %>% 
+  rename(population = estimate,
+         zip = GEOID) %>%
+  select(zip, population, geometry)
+
+
+md_vaxx_for_map <- md_vaxx %>% 
+  left_join(md_zip_pop) %>%
+  select(zip, population, FullyVaccinated, geometry) %>%
+  mutate(pct_vaxxed = (FullyVaccinated / population) * 100) 
+
+
+md_vaxx_for_map %>% 
+  filter(pct_vaxxed <= 50)
+
+md_vaxx_for_map <- md_vaxx_for_map %>%
+  mutate(under_50 = case_when(
+    pct_vaxxed <= 50 ~ pct_vaxxed,
+    pct_vaxxed > 50 ~ NA_real_ ))
+
+
+
+
+ggplot() +
+  geom_sf(data=md_vaxx_for_map, aes(fill=under_50, geometry = geometry)) +
+  theme_minimal() +
+  scale_fill_viridis_b(option="magma") 
+
+
+
+
 ```

@@ -33,13 +33,8 @@ get_jobs <- function(page_link) {
 
 test_url <- "https://dc.fandom.com/wiki/Batman_(Bruce_Wayne)"
 
-dc_data %>%
-  select(name, urlslug)
 
-
-dc_data$urlslug %>% 
-  str_remove_all("\\/wiki\\")
-
+dc_url <- "https://dc.fandom.com"
 
 dc_test <- dc_data %>%
   mutate(slug = gsub("([\\])","", dc_data$urlslug)) %>%
@@ -47,9 +42,6 @@ dc_test <- dc_data %>%
   mutate(full_url = paste0(dc_url, slug))
 
 
-
-
-dc_url <- "https://dc.fandom.com"
 
 
 dc_test$full_url %>% 
@@ -63,25 +55,9 @@ sapply(match_links, FUN = get_jobs, USE.NAMES = FALSE)
 
 reviews <- character()
 
-for(test in 1:9){
-  
-  full_url = paste0(dc_url, dc_test$slug)
-  
-  pages = read_html(full_url)
-  jobs <- 
-    pages %>% 
-    html_nodes(".pi-item-spacing+ .pi-border-color .pi-border-color:nth-child(6) .pi-font") %>% 
-    html_text()
-  
-  reviews <- c(reviews, jobs)
-  
-  print("Scraping reviews in progress")  
-}
 
 
 page<- (dc_test$full_url[1:200])
-
-
 
 
 
@@ -91,7 +67,6 @@ gdxg <- lapply(page, function(i) {
   i %>%
     read_html %>%
     html_nodes(".pi-item-spacing+ .pi-border-color .pi-border-color:nth-child(6) .pi-font") %>% 
-    html_nodes(".pi-item-spacing+ .pi-border-color .pi-border-color:nth-child(5) .pi-font") %>%
     html_text(),
   error = function(e){NA}  
  )

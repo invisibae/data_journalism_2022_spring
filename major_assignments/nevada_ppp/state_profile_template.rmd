@@ -1,0 +1,54 @@
+---
+title: "state_profile"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## PPP State Profile
+
+Your assignment is to explore a dataset of PPP loan applications for a particular state and to answer a series of questions that will help you summarize that state's loan applications. You will need to write R code to answer those questions. You also will bring in other data, including Census information, and you will be making graphics, including maps, to illustrate your findings.
+
+The deliverable will be this R Markdown notebook and a data folder that you will receive with a state's loan application data. Place any other data you are using to answer the questions in the same data folder.
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this assignment.
+
+## Initial Exploration
+
+**Q1.**. Write R code that generates some basic descriptive statistics that allows you to describe the applications from your state. This code should produce results that describe the data in different ways: how many applications there are, along with ways to understand the typical and most frequent values for columns you find interesting or newsworthy. You should produce at least five (5) descriptive statistics and write up a summary of the data using them.
+
+**A1.** 
+
+
+## Geographic Analysis
+
+**Q2.** Write R code that examines geographic patterns for PPP loans in your state, using Census population information to calculate a per-capita figure for the state and counties and zip codes. Then, make a county map using ggplot showing the per-capita data and a zip code map showing the difference from the statewide per-capita figure. Describe the most interesting or newsworthy findings based on your exploration.
+
+**A2.** 
+
+## Lender Analysis
+
+**Q3.** Write R code to examine which lenders had the most approved applications in your state (and include summary statistics such as total amount and average loan amount). Generate dataframes that show the number and total amount of all loans and undisbursed loans per lender. For those lenders who had any undisbursed loans, make a graphic showing the relationship between the total amount of loans and the total undisbursed amount. Describe the most noticeable outlier lenders on that graphic below.
+
+**A3.** 
+
+
+## Industry Analysis
+
+**Q4.** Write R code that examines industry patterns for PPP loans in your state, using the NAICS codes from the PPP data as a starting point. Generate statewide and county industry totals, then join that with 2018-19 data from the [Census County Business Patterns survey](https://www2.census.gov/programs-surveys/cbp/datasets/2019/cbp19co.zip) using 6-digit NAICS codes. The documentation explaining that data can be found here: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2018_record_layouts/county-layout-2018.txt. To do this, you will need to add FIPS codes to your PPP dataset.
+
+Does the distribution of PPP applications by the top 10 industries (by number of applications) roughly match the number of businesses reported in the Census data? Does it roughly match if you remove self-employed individuals and sole proprietorships from the PPP totals? Write up a summary of what you've found and whether there are potentially newsworthy patterns in the data.
+
+Create a county-level map showing the differences between the PPP applications and the Census business data for one of the top 10 industry codes. You can do this either using ggplot or Datawrapper (if the latter, publish that map and include the URL below).
+
+**A4.** 
+
+## Summary
+
+**Q5.** What is the most promising story idea that you have found during this exploration? How would you approach reporting it out and what other information/data would you need to do that? What would be the minimum story you could get from this, and what would be the maximum story?
+
+**A5.**
