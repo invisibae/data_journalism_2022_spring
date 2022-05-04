@@ -88,7 +88,7 @@ Anyways, I think I'm off to a good start here and the work this week will mostly
 
 ```{r}
 
-page<- (dc_test$full_url[1:200])
+page<- (dc_test$full_url)
 
 
 
@@ -104,4 +104,192 @@ gdxg <- lapply(page, function(i) {
 })
 
 
+gdxg[lengths(gdxg) == 0] <- NA_character_
+
+hero_jobs_test <- unlist(gdxg)
+
+dc_data$job <- hero_jobs_test
+
+hero_jobs_test
+
+
+jobs_test <- dc_data %>% 
+  mutate(job = str_to_upper(job)) %>%
+  mutate(job = case_when(job == "MARRIED" ~ NA_character_,
+                         job == "SINGLE" ~ NA_character_,
+                         job == "WIDOWED" ~ NA_character_,
+                         job == "DIVORCED" ~ NA_character_,
+                         TRUE ~ job),
+         married = case_when(job == "MARRIED" ~ "MARRIED",
+                         job == "SINGLE" ~ "SINGLE",
+                         job == "WIDOWED" ~ "WIDOWED",
+                         job == "DIVORCED" ~ "DIVORCED",
+                         TRUE ~ NA_character_))
+
+
+jobs_test %>%
+  mutate(job_yes = case_when(!is.na(job) ~ "has job",
+                             is.na(job) ~ "no job",
+                             TRUE ~ "huh")) %>%
+  group_by(job_yes) %>%
+  count(sort = T) 
+
+jobs_test$full_url <- dc_test$full_url
+
+missing_jobs <- jobs_test %>%
+  filter(is.na(job))
+
+page2 <- missing_jobs$full_url
+
+page2
+
+gdxg2 <- lapply(page2, function(i) {
+  
+ tryCatch(
+  i %>%
+    read_html %>%
+    html_nodes(".pi-group .pi-border-color:nth-child(7) .pi-font") %>% 
+    html_text(),
+  error = function(e){NA}  
+ )
+})
+
+gdxg2
+
+gdxg2[lengths(gdxg) == 0] <- NA_character_
+
+hero_jobs_test2 <- unlist(gdxg2)
+
+hero_jobs_test
+
+dc_data$job <- hero_jobs_test2
+
+hero_jobs_test2
+
+
+
+
+
 ```
+# The Hero Economy
+What are the most common jobs among comic book characters?
+```{r}
+
+most_common_jobs <- jobs_test %>%
+  filter(!is.na(job)) %>%
+  group_by(job) %>%
+  count(sort = T) %>%
+  head(20)
+
+most_common_jobs
+
+least_common_jobs <- jobs_test %>%
+  filter(!is.na(job)) %>%
+  group_by(job) %>%
+  count(sort = T) %>%
+  tail(20)
+```
+
+What are the most common jobs among "good characters" and "bad characters"
+
+Most interesting thing to me here is 'good character' are a lot less defined by their jobs.  'Bad characters' mostly do crime full-time.  While the method of crime might change (e.g. 'mobster', 'terrorist','crimelord') most 'bad character' jobs are defined by doing crime and/or violence.  
+```{r}
+most_common_jobs_heroes <- jobs_test %>%
+  filter(!is.na(job),
+         ALIGN == "Good Characters") %>%
+  group_by(job) %>%
+  count(sort = T) %>%
+  head(20)
+
+most_common_jobs_heroes
+
+most_common_jobs_villains <- jobs_test %>%
+  filter(!is.na(job),
+         ALIGN == "Bad Characters") %>%
+  group_by(job) %>%
+  count(sort = T) %>%
+  head(20)
+
+most_common_jobs_villains
+
+
+```
+
+# Hard Workers 
+how often do commic book characters have multiple jobs ?
+```{r}
+jobs_test %>%
+  filter(!is.na(job)) %>%
+  mutate(job = str_replace_all(job,"·", ",")) %>%
+  mutate(n_jobs = case_when(str_count(job, ",") == 0 ~ "1",
+                            str_count(job, ",") == 1 ~ "2",
+                            str_count(job, ",") == 2 ~ "3",
+                            str_count(job, ",") == 3 ~ "4",
+                            str_count(job, ",") == 4 ~ "5",
+                            TRUE ~ NA_character_
+                            )) %>%
+  select(name, job, n_jobs, ALIGN) %>%
+  group_by(n_jobs) %>%
+  count(sort = T)
+
+multi_job_characters <-   jobs_test %>%
+  filter(!is.na(job)) %>%
+  mutate(job = str_replace_all(job,"·", ",")) %>%
+  mutate(n_jobs = case_when(str_count(job, ",") == 0 ~ "1",
+                            str_count(job, ",") == 1 ~ "2",
+                            str_count(job, ",") == 2 ~ "3",
+                            str_count(job, ",") == 3 ~ "4",
+                            str_count(job, ",") == 4 ~ "5",
+                            TRUE ~ NA_character_
+                            )) %>%
+  mutate(n_jobs = as.double(n_jobs)) %>%
+  select(name, job, n_jobs, ALIGN) %>%
+  filter(n_jobs > 1)
+
+
+
+
+
+
+
+```
+
+# Job Analysis 
+
+Jobs often act as a way to signal a character's morality.  There are certain jobs in our society that are more associated with 'good' or 'bad' behavior and writers take advantage of this for exposition.
+
+Case in point -- Police officer characters:
+```{r}
+
+jobs_test %>%
+  group_by(job) %>%
+  filter(job == "POLICE OFFICER") %>%
+  count(ALIGN, sort = T)
+
+jobs_test %>%
+  group_by(job) %>%
+  filter(job == "CRIMINAL") %>%
+  count(ALIGN, sort = T)
+
+
+```
+
+Not everything is black and white though.  For example, scientist
+
+```{r}
+jobs_test %>%
+  group_by(job) %>%
+  filter(job == "SCIENTIST") %>%
+  count(ALIGN, sort = T)
+
+
+
+```
+
+# Next stop, perform this analysis at scale and do some more data viz
+
+I think the 'story' element of this project will mostly hinge of the kind of job analysis I perform above, but I'd also like to add a little more sophistication in a few ways 
+
+1) more data viz.  I'm thinking I'm going to display my job analysis as a series of stacked bar charts.  Would be a much more efficient way of displaying that info.  Also planning on adding a timeline showing the prevalence of different types of jobs by year/decade.  The hangup there is creating neat job categories to fit as many of the hundreds of unique jobs in the data as I can.  
+
+2) Scale.  I want to see if I can wring a higher number of dc character jobs from that data set.  I also need to try to run the same kind of scraper on marvel wikia to produce results for marvel characters so I can compare the two.  I think I could produce viable analysis with the near 2,000 characters I do have job data on, but more would certainly be better especially because it will allow me to compare two different comic book companies. 

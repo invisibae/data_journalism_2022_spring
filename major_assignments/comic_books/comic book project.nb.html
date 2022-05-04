@@ -1749,15 +1749,31 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHlyKVxubGlicmFyeShsdWJyaWRhdGUpXG5saWJyYXJ5KGphbml0b3IpXG5saWJyYXJ5KHJ2ZXN0KVxubGlicmFyeShnbHVlKVxubGlicmFyeShwdXJycilcbmxpYnJhcnkodGliYmxlKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHlyKVxubGlicmFyeShsdWJyaWRhdGUpXG5saWJyYXJ5KGphbml0b3IpXG5saWJyYXJ5KHJ2ZXN0KVxuXG5gYGAifQ== -->
 <pre class="r"><code>library(readr)
 library(dplyr)
 library(tidyr)
 library(lubridate)
 library(janitor)
 library(rvest)
-library(glue)
-library(purrr)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoicGFja2FnZSDigJhydmVzdOKAmSB3YXMgYnVpbHQgdW5kZXIgUiB2ZXJzaW9uIDQuMC4yXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcnZlc3TigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTpyZWFkcuKAmTpcblxuICAgIGd1ZXNzX2VuY29kaW5nXG4ifQ== -->
+<pre><code>package ‘rvest’ was built under R version 4.0.2
+Attaching package: ‘rvest’
+
+The following object is masked from ‘package:readr’:
+
+    guess_encoding</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnbHVlKVxuYGBgIn0= -->
+<pre class="r"><code>library(glue)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoicGFja2FnZSDigJhnbHVl4oCZIHdhcyBidWlsdCB1bmRlciBSIHZlcnNpb24gNC4wLjVcbiJ9 -->
+<pre><code>package ‘glue’ was built under R version 4.0.5</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwdXJycilcbmxpYnJhcnkodGliYmxlKVxuYGBgIn0= -->
+<pre class="r"><code>library(purrr)
 library(tibble)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -1773,37 +1789,21 @@ library(tibble)</code></pre>
 <p>Stuff like “ALIGN” (whether the character is good or evil), “APPEARANCES”, “YEAR” (year of first appearance), “SEX”, and “name” could prove to be valuable, but the biggest gift from this dataset is the “slug” variable, which should give me an easy way to use rvest to iterate through characters’ URLs to look for more more interesting variables.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGNfZGF0YSAlPiVcblxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGNfZGF0YSAlPiVcbiAgY29sbmFtZXMoKVxuXG5gYGAifQ== -->
 <pre class="r"><code>dc_data %&gt;%
+  colnames()
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZyBtZXNzYWdlOlxuSW4gLkludGVybmFsKHZhcHBseShYLCBGVU4sIEZVTi5WQUxVRSwgVVNFLk5BTUVTKSkgOlxuICBjbG9zaW5nIHVudXNlZCBjb25uZWN0aW9uIDMgKGh0dHBzOi8vZGMuZmFuZG9tLmNvbS93aWtpL0FsYW5uYV9TdHJhbmdlXyhOZXdfRWFydGgpKVxuIn0= -->
-<pre><code>Warning message:
-In .Internal(vapply(X, FUN, FUN.VALUE, USE.NAMES)) :
-  closing unused connection 3 (https://dc.fandom.com/wiki/Alanna_Strange_(New_Earth))</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuICBjb2xuYW1lcygpXG5gYGAifQ== -->
-<pre class="r"><code>  colnames()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcInBhZ2VfaWRcIiAgICAgICAgICBcIm5hbWVcIiAgICAgICAgICAgICBcInVybHNsdWdcIiAgICAgICAgICBcIklEXCIgICAgICAgICAgICAgICBcIkFMSUdOXCIgICAgICAgICAgICBcIkVZRVwiICAgICAgICAgICAgICBcIkhBSVJcIiAgICAgICAgICAgIFxuIFs4XSBcIlNFWFwiICAgICAgICAgICAgICBcIkdTTVwiICAgICAgICAgICAgICBcIkFMSVZFXCIgICAgICAgICAgICBcIkFQUEVBUkFOQ0VTXCIgICAgICBcIkZJUlNUIEFQUEVBUkFOQ0VcIiBcIllFQVJcIiAgICAgICAgICAgIFxuIn0= -->
-<pre><code> [1] &quot;page_id&quot;          &quot;name&quot;             &quot;urlslug&quot;          &quot;ID&quot;               &quot;ALIGN&quot;            &quot;EYE&quot;              &quot;HAIR&quot;            
- [8] &quot;SEX&quot;              &quot;GSM&quot;              &quot;ALIVE&quot;            &quot;APPEARANCES&quot;      &quot;FIRST APPEARANCE&quot; &quot;YEAR&quot;            </code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcInBhZ2VfaWRcIiAgICAgICAgICBcIm5hbWVcIiAgICAgICAgICAgICBcInVybHNsdWdcIiAgICAgICAgICBcIklEXCIgICAgICAgICAgICAgICBcIkFMSUdOXCIgICAgICAgICAgICBcIkVZRVwiICAgICAgICAgICAgIFxuIFs3XSBcIkhBSVJcIiAgICAgICAgICAgICBcIlNFWFwiICAgICAgICAgICAgICBcIkdTTVwiICAgICAgICAgICAgICBcIkFMSVZFXCIgICAgICAgICAgICBcIkFQUEVBUkFOQ0VTXCIgICAgICBcIkZJUlNUIEFQUEVBUkFOQ0VcIlxuWzEzXSBcIllFQVJcIiAgICAgICAgICAgIFxuIn0= -->
+<pre><code> [1] &quot;page_id&quot;          &quot;name&quot;             &quot;urlslug&quot;          &quot;ID&quot;               &quot;ALIGN&quot;            &quot;EYE&quot;             
+ [7] &quot;HAIR&quot;             &quot;SEX&quot;              &quot;GSM&quot;              &quot;ALIVE&quot;            &quot;APPEARANCES&quot;      &quot;FIRST APPEARANCE&quot;
+[13] &quot;YEAR&quot;            </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Let’s create a new dataframe with a “full_url” column</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5kY191cmwgPC0gXCJodHRwczovL2RjLmZhbmRvbS5jb21cIlxuXG5kY190ZXN0IDwtIGRjX2RhdGEgJT4lXG4gIG11dGF0ZShzbHVnID0gZ3N1YihcIihbXFxcXF0pXCIsXCJcIiwgZGNfZGF0YSR1cmxzbHVnKSkgJT4lXG4gIHNlbGVjdChuYW1lLCBzbHVnKSAlPiVcbiAgbXV0YXRlKGZ1bGxfdXJsID0gcGFzdGUwKGRjX3VybCwgc2x1ZykpXG5cblxuYGBgIn0= -->
-<pre class="r"><code>
-dc_url &lt;- &quot;https://dc.fandom.com&quot;
-
-dc_test &lt;- dc_data %&gt;%
-  mutate(slug = gsub(&quot;([\\])&quot;,&quot;&quot;, dc_data$urlslug)) %&gt;%
-  select(name, slug) %&gt;%
-  mutate(full_url = paste0(dc_url, slug))
-</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1832,29 +1832,197 @@ dc_test &lt;- dc_data %&gt;%
 <p>Anyways, I think I’m off to a good start here and the work this week will mostly revolve around refining the scraping function and then hopefully jumping into some analysis</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5wYWdlPC0gKGRjX3Rlc3QkZnVsbF91cmxbMToyMDBdKVxuXG5cblxuZ2R4ZyA8LSBsYXBwbHkocGFnZSwgZnVuY3Rpb24oaSkge1xuICBcbiB0cnlDYXRjaChcbiAgaSAlPiVcbiAgICByZWFkX2h0bWwgJT4lXG4gICAgaHRtbF9ub2RlcyhcIi5waS1pdGVtLXNwYWNpbmcrIC5waS1ib3JkZXItY29sb3IgLnBpLWJvcmRlci1jb2xvcjpudGgtY2hpbGQoNikgLnBpLWZvbnRcIikgJT4lIFxuICAgIGh0bWxfdGV4dCgpLFxuICBlcnJvciA9IGZ1bmN0aW9uKGUpe05BfSAgXG4gKVxufSlcblxuXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVyb19qb2JzX3Rlc3QyXG5cbmBgYCJ9 -->
+<pre class="r"><code>hero_jobs_test2
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkFkdmVudHVyZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIFsyXSBcIldoaXRlXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIFszXSBcIkFzdHJvbmF1dCwgTWFzcyBNdXJkZXJlciwgSW50ZXJnYWxhY3RpYyBUZXJyb3Jpc3QsIE1lbWJlciBvZiB0aGUgU2luZXN0cm8gQ29ycHNcIiAgICAgICAgIFxuIFs0XSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiBbNV0gXCJPcmFuZ2VcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiBbNl0gXCJQcm9mZXNzaW9uYWwgY3JpbWluYWxcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiBbN10gXCJHZW5lcmFsIChTdHJhdGVnb3MpIMK3IENhcHRhaW4gb2YgdGhlIFJveWFsIEd1YXJkXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gWzhdIFwiT3JhbmdlXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gWzldIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzEwXSBcIkJyb3duXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzExXSBcIlNvbGRpZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzEyXSBcIlNvbGRpZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzEzXSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxNF0gXCJHcmV5XCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxNV0gXCJHcmVlblwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxNl0gXCJPcGVyYXRpdmUsIEJvZHlndWFyZFwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxN10gXCJHdWFyZGlhbiBvZiB0aGUgU2lucyBvZiBNYW4sIEtlZXBlciBvZiB0aGUgUm9jayBvZiBFdGVybml0eVwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxOF0gXCJTY2llbnRpc3RcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsxOV0gXCJQcm9mZXNzaW9uYWwgQ3JpbWluYWxcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsyMF0gXCJTb3JjZXJlc3NcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsyMV0gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMjJdIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzIzXSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsyNF0gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMjVdIFwiUmVkXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMjZdIFwiV2FybG9jayDCtyBmb3JtZXJseSBDaGVja21hdGUgc3B5IMK3IE15c3RpYyBDb25zdWx0YW50XCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblsyN10gXCJBY3RyZXNzIMK3IExlZ2lvbm5haXJlXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMjhdIFwiWWVsbG93XCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMjldIFwiQWR2ZW50dXJlciDCtyBTdHVkZW50XCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzMwXSBcIlRlYWNoZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzMxXSBcIlllbGxvd1wiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzMyXSBcIkRvdWJsZSBhZ2VudCBmb3IgdGhlIEJsYWNrIExhbnRlcm4gQ29ycHMsIGZvcm1lciBtZW1iZXIgb2YgdGhlIEd1YXJkaWFucyBvZiB0aGUgVW5pdmVyc2VcIlxuWzMzXSBcIkFkdmVudHVyZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzM0XSBcIlNvbGRpZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzM1XSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblszNl0gXCJTb2xkaWVyXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcblszN10gXCJBZHZlbnR1cmVyIMK3IFN0YWdlIE1hZ2ljaWFuXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMzhdIFwiTWVtYmVyIG9mIHRoZSBOZXcgS3J5cHRvbiBTY2llbmNlIENvdW5jaWxcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bMzldIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzQwXSBcIkFkdmVudHVyZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzQxXSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbls0Ml0gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNDNdIFwiR3VhcmRpYW4gb2YgdGhlIFVuaXZlcnNlXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNDRdIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzQ1XSBcIlllbGxvd1wiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzQ2XSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbls0N10gXCJQcmllc3Rlc3MgwrcgT3JhY2xlXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNDhdIFwiR3JlZW5cIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNDldIFwiS2FuZG9yaWFuIHNlY3VyaXR5IGNoaWVmXCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNTBdIFwiQWR2ZW50dXJlciDCtyBTdHVkZW50XCIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzUxXSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbls1Ml0gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNTNdIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzU0XSBcIkFkdmVudHVyZXIsIFN0dWRlbnRcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzU1XSBcIlNjaWVudGlzdCwgYXJ0aXN0LCBsZWFkZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzU2XSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbls1N10gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNThdIFwiTGF3eWVyLCBmb3JtZXIgc29sZGllclwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNTldIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzYwXSBcIldpemFyZFwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzYxXSBOQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbls2Ml0gTkEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNjNdIFwiTGVnaW9ubmFpcmVcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNjRdIFwiUXVlZW4gb2YgQXRsYW50aXNcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG5bNjVdIE5BICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzY2XSBcIlNvbGRpZXJcIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuWzY3XSBcIk9yYW5nZVwiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
+<pre><code> [1] &quot;Adventurer&quot;                                                                              
+ [2] &quot;White&quot;                                                                                   
+ [3] &quot;Astronaut, Mass Murderer, Intergalactic Terrorist, Member of the Sinestro Corps&quot;         
+ [4] NA                                                                                        
+ [5] &quot;Orange&quot;                                                                                  
+ [6] &quot;Professional criminal&quot;                                                                   
+ [7] &quot;General (Strategos) · Captain of the Royal Guard&quot;                                        
+ [8] &quot;Orange&quot;                                                                                  
+ [9] NA                                                                                        
+[10] &quot;Brown&quot;                                                                                   
+[11] &quot;Soldier&quot;                                                                                 
+[12] &quot;Soldier&quot;                                                                                 
+[13] NA                                                                                        
+[14] &quot;Grey&quot;                                                                                    
+[15] &quot;Green&quot;                                                                                   
+[16] &quot;Operative, Bodyguard&quot;                                                                    
+[17] &quot;Guardian of the Sins of Man, Keeper of the Rock of Eternity&quot;                             
+[18] &quot;Scientist&quot;                                                                               
+[19] &quot;Professional Criminal&quot;                                                                   
+[20] &quot;Sorceress&quot;                                                                               
+[21] NA                                                                                        
+[22] NA                                                                                        
+[23] NA                                                                                        
+[24] NA                                                                                        
+[25] &quot;Red&quot;                                                                                     
+[26] &quot;Warlock · formerly Checkmate spy · Mystic Consultant&quot;                                    
+[27] &quot;Actress · Legionnaire&quot;                                                                   
+[28] &quot;Yellow&quot;                                                                                  
+[29] &quot;Adventurer · Student&quot;                                                                    
+[30] &quot;Teacher&quot;                                                                                 
+[31] &quot;Yellow&quot;                                                                                  
+[32] &quot;Double agent for the Black Lantern Corps, former member of the Guardians of the Universe&quot;
+[33] &quot;Adventurer&quot;                                                                              
+[34] &quot;Soldier&quot;                                                                                 
+[35] NA                                                                                        
+[36] &quot;Soldier&quot;                                                                                 
+[37] &quot;Adventurer · Stage Magician&quot;                                                             
+[38] &quot;Member of the New Krypton Science Council&quot;                                               
+[39] NA                                                                                        
+[40] &quot;Adventurer&quot;                                                                              
+[41] NA                                                                                        
+[42] NA                                                                                        
+[43] &quot;Guardian of the Universe&quot;                                                                
+[44] NA                                                                                        
+[45] &quot;Yellow&quot;                                                                                  
+[46] NA                                                                                        
+[47] &quot;Priestess · Oracle&quot;                                                                      
+[48] &quot;Green&quot;                                                                                   
+[49] &quot;Kandorian security chief&quot;                                                                
+[50] &quot;Adventurer · Student&quot;                                                                    
+[51] NA                                                                                        
+[52] NA                                                                                        
+[53] NA                                                                                        
+[54] &quot;Adventurer, Student&quot;                                                                     
+[55] &quot;Scientist, artist, leader&quot;                                                               
+[56] NA                                                                                        
+[57] NA                                                                                        
+[58] &quot;Lawyer, former soldier&quot;                                                                  
+[59] NA                                                                                        
+[60] &quot;Wizard&quot;                                                                                  
+[61] NA                                                                                        
+[62] NA                                                                                        
+[63] &quot;Legionnaire&quot;                                                                             
+[64] &quot;Queen of Atlantis&quot;                                                                       
+[65] NA                                                                                        
+[66] &quot;Soldier&quot;                                                                                 
+[67] &quot;Orange&quot;                                                                                  </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="the-hero-economy" class="section level1">
+<h1>The Hero Economy</h1>
+<p>What are the most common jobs among comic book characters?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tb3N0X2NvbW1vbl9qb2JzIDwtIGpvYnNfdGVzdCAlPiVcbiAgZmlsdGVyKCFpcy5uYShqb2IpKSAlPiVcbiAgZ3JvdXBfYnkoam9iKSAlPiVcbiAgY291bnQoc29ydCA9IFQpICU+JVxuICBoZWFkKDIwKVxuXG5tb3N0X2NvbW1vbl9qb2JzXG5cbmxlYXN0X2NvbW1vbl9qb2JzIDwtIGpvYnNfdGVzdCAlPiVcbiAgZmlsdGVyKCFpcy5uYShqb2IpKSAlPiVcbiAgZ3JvdXBfYnkoam9iKSAlPiVcbiAgY291bnQoc29ydCA9IFQpICU+JVxuICB0YWlsKDIwKVxuYGBgIn0= -->
 <pre class="r"><code>
-page&lt;- (dc_test$full_url[1:200])
+most_common_jobs &lt;- jobs_test %&gt;%
+  filter(!is.na(job)) %&gt;%
+  group_by(job) %&gt;%
+  count(sort = T) %&gt;%
+  head(20)
 
+most_common_jobs
 
+least_common_jobs &lt;- jobs_test %&gt;%
+  filter(!is.na(job)) %&gt;%
+  group_by(job) %&gt;%
+  count(sort = T) %&gt;%
+  tail(20)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>What are the most common jobs among “good characters” and “bad characters”</p>
+<p>Most interesting thing to me here is ‘good character’ are a lot less defined by their jobs. ‘Bad characters’ mostly do crime full-time. While the method of crime might change (e.g. ‘mobster’, ‘terrorist’,‘crimelord’) most ‘bad character’ jobs are defined by doing crime and/or violence.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5jb2wiOjIsIm5yb3ciOjIwfSwicmRmIjoiSDRzSUFBQUFBQUFBQTExU3owL0NNQlF1UHlZeWc1R2dKMlBDeFhpQ0dEbm90V3dkTkJtVXRCdUl0d21vS0c0RVp2VG9IK3pmSUw2T2R1Q1dmVzNmOTE3Zis5cFhidCszekhzVElWUkFSVGthTUNERDk1ekdIVUxGUEJnNWNKVGwvQVh1R2l3a2VRSTRWWTZ6QVdjT0VZS3lQbmJyRnFjOUNndmxQTXphV0FqNGFWL1o1UjdoRnVsalB0YUVzQ2pwZTFSNGlxZ0lmMEI0WTBoZEY2ZmJTajNXRmg3aDJoVE10V2xxR2w2WEVrZjdScGh6eXRMUU5uMEFndWx5VWg5eEdiY1ZZV0o3Q1BWOW5tWTdhdnVnRnc3WXcybDU0ZmsyUk9ra29JUXp2dE44NE9MUk9FMXdQR0F1dFVpZE9RNU1tcTFnYm5VeFlTN3I3RGFXMjh3ZWQzd01jaUFpdVdTRXJnRlhnRXZBQmVBY1VKWEJHUndxbEtRQ2VRMEtSWVhDRnYrNmFrd1d3WHF0T3FwSmN4ckVRZk5wRmJ6UE11SGxWZlRaRElGZkszMzVieGcybTgxUE5xOE9Pa2xlekpZc3ZFYVAraldGTVB4bU5wV2laVHlQUXRpV3J5bnQrN0p5cXd4Ui9RaGxtV2xqOHZJUnZqVnVXemRTZkJLdy9TcHFmYnEzem0rTEZqY3FtYUY3Tmd1ZjUrRk02MThFajdPRmJpQ2NPamxQYzdtYWg3RytKV0RYelRpS0F4MW5UcUtGWnBMVG9kOC9uVDdCYkdFREFBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["job"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"PROFESSIONAL CRIMINAL","2":"48"},{"1":"CRIMINAL","2":"39"},{"1":"ASSASSIN","2":"37"},{"1":"MERCENARY","2":"29"},{"1":"SCIENTIST","2":"27"},{"1":"SUPER-VILLAIN","2":"17"},{"1":"MOBSTER","2":"9"},{"1":"SOLDIER","2":"9"},{"1":"THIEF","2":"9"},{"1":"WARRIOR","2":"9"},{"1":"BIZARRO","2":"8"},{"1":"CRIMELORD","2":"8"},{"1":"ADVENTURER","2":"7"},{"1":"BUSINESSMAN","2":"6"},{"1":"STUDENT","2":"5"},{"1":"TERRORIST","2":"5"},{"1":"LAWYER","2":"4"},{"1":"POLICE OFFICER","2":"4"},{"1":"ARCHAEOLOGIST","2":"3"},{"1":"BODYGUARD","2":"3"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[20]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="hard-workers" class="section level1">
+<h1>Hard Workers</h1>
+<p>how often do commic book characters have multiple jobs ?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuam9ic190ZXN0ICU+JVxuICBmaWx0ZXIoIWlzLm5hKGpvYikpICU+JVxuICBtdXRhdGUoam9iID0gc3RyX3JlcGxhY2VfYWxsKGpvYixcIsK3XCIsIFwiLFwiKSkgJT4lXG4gIG11dGF0ZShuX2pvYnMgPSBjYXNlX3doZW4oc3RyX2NvdW50KGpvYiwgXCIsXCIpID09IDAgfiBcIjFcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJfY291bnQoam9iLCBcIixcIikgPT0gMSB+IFwiMlwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsIFwiLFwiKSA9PSAyIH4gXCIzXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RyX2NvdW50KGpvYiwgXCIsXCIpID09IDMgfiBcIjRcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJfY291bnQoam9iLCBcIixcIikgPT0gNCB+IFwiNVwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRSVUUgfiBOQV9jaGFyYWN0ZXJfXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgKSkgJT4lXG4gIHNlbGVjdChuYW1lLCBqb2IsIG5fam9icywgQUxJR04pICU+JVxuICBncm91cF9ieShuX2pvYnMpICU+JVxuICBjb3VudChzb3J0ID0gVClcblxubXVsdGlfam9iX2NoYXJhY3RlcnMgPC0gICBqb2JzX3Rlc3QgJT4lXG4gIGZpbHRlcighaXMubmEoam9iKSkgJT4lXG4gIG11dGF0ZShqb2IgPSBzdHJfcmVwbGFjZV9hbGwoam9iLFwiwrdcIiwgXCIsXCIpKSAlPiVcbiAgbXV0YXRlKG5fam9icyA9IGNhc2Vfd2hlbihzdHJfY291bnQoam9iLCBcIixcIikgPT0gMCB+IFwiMVwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsIFwiLFwiKSA9PSAxIH4gXCIyXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RyX2NvdW50KGpvYiwgXCIsXCIpID09IDIgfiBcIjNcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJfY291bnQoam9iLCBcIixcIikgPT0gMyB+IFwiNFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsIFwiLFwiKSA9PSA0IH4gXCI1XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgVFJVRSB+IE5BX2NoYXJhY3Rlcl9cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApKSAlPiVcbiAgbXV0YXRlKG5fam9icyA9IGFzLmRvdWJsZShuX2pvYnMpKSAlPiVcbiAgc2VsZWN0KG5hbWUsIGpvYiwgbl9qb2JzLCBBTElHTikgJT4lXG4gIGZpbHRlcihuX2pvYnMgPiAxKVxuXG5cblxuXG5cblxuXG5gYGAifQ== -->
+<pre class="r"><code>jobs_test %&gt;%
+  filter(!is.na(job)) %&gt;%
+  mutate(job = str_replace_all(job,&quot;·&quot;, &quot;,&quot;)) %&gt;%
+  mutate(n_jobs = case_when(str_count(job, &quot;,&quot;) == 0 ~ &quot;1&quot;,
+                            str_count(job, &quot;,&quot;) == 1 ~ &quot;2&quot;,
+                            str_count(job, &quot;,&quot;) == 2 ~ &quot;3&quot;,
+                            str_count(job, &quot;,&quot;) == 3 ~ &quot;4&quot;,
+                            str_count(job, &quot;,&quot;) == 4 ~ &quot;5&quot;,
+                            TRUE ~ NA_character_
+                            )) %&gt;%
+  select(name, job, n_jobs, ALIGN) %&gt;%
+  group_by(n_jobs) %&gt;%
+  count(sort = T)
 
-gdxg &lt;- lapply(page, function(i) {
-  
- tryCatch(
-  i %&gt;%
-    read_html %&gt;%
-    html_nodes(&quot;.pi-item-spacing+ .pi-border-color .pi-border-color:nth-child(6) .pi-font&quot;) %&gt;% 
-    html_text(),
-  error = function(e){NA}  
- )
-})
+multi_job_characters &lt;-   jobs_test %&gt;%
+  filter(!is.na(job)) %&gt;%
+  mutate(job = str_replace_all(job,&quot;·&quot;, &quot;,&quot;)) %&gt;%
+  mutate(n_jobs = case_when(str_count(job, &quot;,&quot;) == 0 ~ &quot;1&quot;,
+                            str_count(job, &quot;,&quot;) == 1 ~ &quot;2&quot;,
+                            str_count(job, &quot;,&quot;) == 2 ~ &quot;3&quot;,
+                            str_count(job, &quot;,&quot;) == 3 ~ &quot;4&quot;,
+                            str_count(job, &quot;,&quot;) == 4 ~ &quot;5&quot;,
+                            TRUE ~ NA_character_
+                            )) %&gt;%
+  mutate(n_jobs = as.double(n_jobs)) %&gt;%
+  select(name, job, n_jobs, ALIGN) %&gt;%
+  filter(n_jobs &gt; 1)
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
+<div id="job-analysis" class="section level1">
+<h1>Job Analysis</h1>
+<p>Jobs often act as a way to signal a character’s morality. There are certain jobs in our society that are more associated with ‘good’ or ‘bad’ behavior and writers take advantage of this for exposition.</p>
+<p>Case in point – Police officer characters:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5jb2wiOjMsIm5yb3ciOjN9LCJyZGYiOiJINHNJQUFBQUFBQUFBNFZSUFUvRE1CQzlKakdRU0VWOC9BRTJwbVFwRXF5bENCU3BaS2hBNnVvbWhnYU1YZG1PWU9TUDAzSTJ0dFJrd1ZMTzludm5kL2N1aTd2bEpGdG1BQkJEWWlQQkFPVDU2VDYvQVVnaXZJeVFTTzMraGZTNXl3UTQ4UzhzY1RSYmxJOWxOWjMvZSsrL083Nmx6Y1ZzVFJXdERWUGFvMmNWNjR5aWZKOEJTSGU0Y0IvNytwZjRKYTY1ZnBPazVsUnJYeWlBV1VNTkxWNFUvV0NEOUZUSnowSWdycjEyOUkwQlMvME1kVVBTdm9INFRhNENQNTJYRDFXWWxNQ3dIU2djeW8xcHBVQ055QTZSREhvY3FRRncyZ2xiczhucmRTZmU4K3ZKbFhYeVo5bXRzVC9IL2JNdG11eThHUEZpQjB5OHRvS0ZaamxkTVI3K0FvN0FtU3MycWhVbWpBeFJYUmhwYU1qTGFza0Q0dHpCOWhlUi9XNFRQUUlBQUE9PSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["job"],"name":[1],"type":["chr"],"align":["left"]},{"label":["ALIGN"],"name":[2],"type":["chr"],"align":["left"]},{"label":["n"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"CRIMINAL","2":"Bad Characters","3":"39"},{"1":"CRIMINAL","2":"Neutral Characters","3":"4"},{"1":"CRIMINAL","2":"NA","3":"1"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Not everything is black and white though. For example, scientist</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5jb2wiOjMsIm5yb3ciOjR9LCJyZGYiOiJINHNJQUFBQUFBQUFBNTFSWFV2RE1CUzk2NGZTd25TNkovSEZQOUNDN0VGZmRlb29qRDY0Q252TjJ1aXFOUmxKaWo3NncyWGJUWnRBVjN3eWtKdmtuTU81SDNsK1dFN0NaUWdBTG5nNitoakFmOG1lb2xzQXo4SEhBSWxBbjk5SWp4c2x3QWkzWjRoZ01VMGUweXhaWlA4QkRyMU83a2x4TlYwVFFYSkZoVFRvNll6elArRHpsTlpLa0tyTG9QY09GNTdEeGhiZ0V2ZUZicXA5SC9UazV4V1IwdFJnd2JBZ2lzU3ZnbnpTbmp3US9DdG1pRXZqNy94Z3dIUy9mVjhyR3BuSmF0Qjk1eXZMMzgyVFdXb0h5ekJzZXc3SGZLTkt6dERER1p2aXV6VU9SQTg0cTVuT1dVVDV1bVlmMGMza1duZlNDTm8xTkhldmMzZmJwTjdPbVBuRzdJaXl0NUpSVzJ4RlZyU3lINFFqYUpxTE42Smt5bzRNVVJrcnJvalZoVG12TE5KMEI5czlKM3RDZjJ3Q0FBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["job"],"name":[1],"type":["chr"],"align":["left"]},{"label":["ALIGN"],"name":[2],"type":["chr"],"align":["left"]},{"label":["n"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"SCIENTIST","2":"Bad Characters","3":"27"},{"1":"SCIENTIST","2":"Good Characters","3":"25"},{"1":"SCIENTIST","2":"Neutral Characters","3":"5"},{"1":"SCIENTIST","2":"NA","3":"4"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[4]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="next-stop-perform-this-analysis-at-scale-and-do-some-more-data-viz" class="section level1">
+<h1>Next stop, perform this analysis at scale and do some more data viz</h1>
+<p>I think the ‘story’ element of this project will mostly hinge of the kind of job analysis I perform above, but I’d also like to add a little more sophistication in a few ways</p>
+<ol style="list-style-type: decimal">
+<li><p>more data viz. I’m thinking I’m going to display my job analysis as a series of stacked bar charts. Would be a much more efficient way of displaying that info. Also planning on adding a timeline showing the prevalence of different types of jobs by year/decade. The hangup there is creating neat job categories to fit as many of the hundreds of unique jobs in the data as I can.</p></li>
+<li><p>Scale. I want to see if I can wring a higher number of dc character jobs from that data set. I also need to try to run the same kind of scraper on marvel wikia to produce results for marvel characters so I can compare the two. I think I could produce viable analysis with the near 2,000 characters I do have job data on, but more would certainly be better especially because it will allow me to compare two different comic book companies.</p></li>
+</ol>
+<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ29taWMgQm9vayBKb3VybmFsIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgoKYGBge3J9CmxpYnJhcnkocmVhZHIpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkodGlkeXIpCmxpYnJhcnkobHVicmlkYXRlKQpsaWJyYXJ5KGphbml0b3IpCmxpYnJhcnkocnZlc3QpCmxpYnJhcnkoZ2x1ZSkKbGlicmFyeShwdXJycikKbGlicmFyeSh0aWJibGUpCmBgYAojIyBPa2F5IFdoYXQgRG8gSSBEbz8KClRoZSBjb21taWMgYm9vayBkYXRhIHByb3ZpZGVzIGEgZmV3IGludGVyZXN0aW5nIGlkZWFzLiAgCgpUaGUgb3JpZ2luYWwgcGllY2UgdGhpcyBkYXRhIHdhcyB1c2VkIGZvciBpcyBhYm91dCB0aGUgZXZvbHV0aW9uIG9mIHJlcHJlc2VudGF0aW9uIG9mIGdlbmRlciBhbmQgc2V4dWFsaXR5IG92ZXIgdGhlIHllYXJzIGluIE1hcnZlbCBhbmQgREMgY29taWNzLgoKSSdsbCB0cnkgbm90IHRvIHJlcGVhdCB0aGlzIGlkZWEsIGJ1dCBpbiBkb2luZyBzbyBJIHJ1biBpbnRvIG15IGZpcnN0IHByb2JsZW06IAoKIyMjIFByb2JsZW0gMTogVGhlIFZhcmlhYmxlcyBhcmUgYSBCaXQgRHVsbAoKSWYgSSdtIGdvaW5nIHRvIGdvIGluIGEgZGlmZmVyZW50IGRpcmVjdGlvbiwgdGhlIHZhcmlhYmxlcyBhcmVuJ3QgdGhlIGJlc3QuICBUaGV5IGdpdmUgbWUgYSBuaWNlIHN0YXJ0aW5nIHBvaW50LCBidXQgSSdtIGdvaW5nIHRvIGhhdmUgdG8gZG8gYSBsaXR0bGUgbW9yZSB3b3JrIGlmIEkgd2FudCB0byBkbyBzb21lIG9yaWdpbmFsIGFuYWx5c2lzLiAgCgpTdHVmZiBsaWtlICJBTElHTiIgKHdoZXRoZXIgdGhlIGNoYXJhY3RlciBpcyBnb29kIG9yIGV2aWwpLCAiQVBQRUFSQU5DRVMiLCAiWUVBUiIgKHllYXIgb2YgZmlyc3QgYXBwZWFyYW5jZSksICJTRVgiLCBhbmQgIm5hbWUiIGNvdWxkIHByb3ZlIHRvIGJlIHZhbHVhYmxlLCBidXQgdGhlIGJpZ2dlc3QgZ2lmdCBmcm9tIHRoaXMgZGF0YXNldCBpcyB0aGUgInNsdWciIHZhcmlhYmxlLCB3aGljaCBzaG91bGQgZ2l2ZSBtZSBhbiBlYXN5IHdheSB0byB1c2UgcnZlc3QgdG8gaXRlcmF0ZSB0aHJvdWdoIGNoYXJhY3RlcnMnIFVSTHMgdG8gbG9vayBmb3IgbW9yZSBtb3JlIGludGVyZXN0aW5nIHZhcmlhYmxlcy4KCmBgYHtyfQpkY19kYXRhIDwtIHJlYWRfY3N2KCJkYXRhL2RjLXdpa2lhLWRhdGEuY3N2IikKCm1hcnZlbF9kYXRhIDwtIHJlYWRfY3N2KCJkYXRhL21hcnZlbC13aWtpYS1kYXRhLmNzdiIpCgpkY19kYXRhICU+JQogIGNvbG5hbWVzKCkKYGBgCgpMZXQncyBjcmVhdGUgYSBuZXcgZGF0YWZyYW1lIHdpdGggYSAiZnVsbF91cmwiIGNvbHVtbiAKCmBgYHtyfQoKZGNfdXJsIDwtICJodHRwczovL2RjLmZhbmRvbS5jb20iCgpkY190ZXN0IDwtIGRjX2RhdGEgJT4lCiAgbXV0YXRlKHNsdWcgPSBnc3ViKCIoW1xcXSkiLCIiLCBkY19kYXRhJHVybHNsdWcpKSAlPiUKICBzZWxlY3QobmFtZSwgc2x1ZykgJT4lCiAgbXV0YXRlKGZ1bGxfdXJsID0gcGFzdGUwKGRjX3VybCwgc2x1ZykpCgoKYGBgCgoKIyMgTXkgRmlyc3QgSWRlYTogV2hhdCBEbyBTdXBlcmhlcm9lcyBEbyBXaGVuIFRoZXkncmUgTm90IEJlaW5nIFN1cGVyaGVyb2VzPwoKT25lIG9mIHRoZSB2YXJpYWJsZXMgdGhhdCBjYXVnaHQgbXkgZXllIGVhcmx5IChhZnRlciBJIHNwZW50IGEgZmV3IG1pbnV0ZXMgbXVzaW5nIG9uIHdoZXRoZXIgaGVpZ2h0IGFuZCB3ZWlnaHQgd2FzIGVub3VnaCB0byBhc3NlbWJsZSBhIHN1cGVyaGVybyBiYXNrZXRiYWxsIHRlYW0gZm9yIGVhY2ggdW5pdmVyc2UpIHdhcyB0aGUgIm9jY3VwYXRpb24iIGZpZWxkIGxpc3RlZCBvbiBtYW55IG9mIHRoZSBzdXBlcmhlcm8gd2lraWEgcGFnZXMuICAKCkkgZm91bmQgdGhpcyBhIHJlYWxseSBpbnRlcmVzdGluZyBmb3IgYSBmZXcgcmVhc29uczoKCjEpIEl0J3MgYW4gZWFzeSB3YXkgb2YgYXNjcmliaW5nIGNsYXNzIHRvIGNvbWljIGJvb2sgY2hhcmFjdGVycy4gQ2xhc3MgaXNuJ3Qgc29tZXRoaW5nIHRoYXQncyBtZW50aW9uZWQgYWxsIHRoYXQgb2Z0ZW4gaW4gY29taWMgYm9va3MgKGF0IGxlYXN0IGFzIGZhciBhcyBJIGtub3cpLiAgUGFydCBvZiB0aGUgcmVhc29uIHN1cGVyaGVyb2VzIGluc3BpcmUgc28gbWFueSBvZiB1cyBpcyBiZWNhdXNlIHN1cGVycG93ZXJzIHJlbW92ZSByZXNvdXJjZXMgYXMgYSBjb25zdHJhaW50IG9uIHBvdGVudGlhbC4gIFN1cGVyaGVyb2VzIGNhbiBvZnRlbiBwdW5jaCBhbmQga2ljayB0aGVpciB3YXkgb3V0IG9mIHByb2JsZW1zIHRoYXQgd291bGQgYmUgZmFyIG1vcmUgY29tcGxpY2F0ZWQgZm9yIG5vcm1hbCBwZW9wbGUuICBCdXQgaXQgbWFrZXMgbWUgd29uZGVyLCBpcyB0aGVyZSBhIGNsZWFyIGRpc3RpbmN0aW9uIG9mIGNsYXNzZXMgYW1vbmcgc3VwZXJoZXJvZXM/ICBBcmUgdGhlcmUgcG9vciBzdXBlcmhlcm9lcz8gIEFyZSBtb3JlIHZpbGxhaW5zIHBvb3I/ICAKCjIpIEl0IGdpdmVzIGEgY2hhcmFjdGVyIGFkZGl0aW9uYWwgZGVwdGguICBTcGlkZXItTWFuIGlzIGEgd29uZGVyZnVsIGV4YW1wbGUgb2YgdGhpcy4gIEhlIGlzIGEgbW9yZSBlZmZlY3RpdmUgY2hhcmFjdGVyIGJlY2F1c2UgaGUgaXMgYSBub3JtYWwgcGVyc29uIHdobyB3ZSBvZnRlbiBzZWUgZ29pbmcgdG8gc2Nob29sIGFuZCB3b3JraW5nIGpvYnMuICBXZSBzZWUgdGhlIHBlcnNvbmFsIHNhY3JpZmljZXMgUGV0ZXIgUGFya2VyIG1ha2VzIGluIHRlcm1zIG9mIGhpcyB0aW1lIGFuZCByZXNwb25zaWJpbGl0aWVzIHRvIGZpZ2h0IGNyaW1lLCBzbyBlYWNoIHRpbWUgaGUgYm9sdHMgb3V0IG9mIGEgcm9vbSB0byBzdWl0IHVwLCBpdCBmZWVscyBpbXBhY3RmdWwgYmVjYXVzZSB3ZSBjYW4gYWxsIHJlbGF0ZSB0byB0aGF0IGtpbmQgb2Ygc2FjcmlmaWNlLiAgCgozKSBIb3cgbWFueSBqb2JzIGNhbiB5b3Ugd29yayBhbmQgc3RpbGwgZmlnaHQgY3JpbWU6IE9uZSBvZiB0aGUgZmlyc3QgdGhpbmdzIEkgbm90aWNlZCB3YXMgdGhhdCBtYW55IGNoYXJhY3RlcnMgaGFkIG11bHRpcGxlIGpvYnMuICBJdCBtYWRlIG1lIHdvbmRlciBhYm91dCB0aGUgdHlwaWNhbCB0aW1lIGNvbW1pdG1lbnQgZm9yIHN1cGVyaGVybyBhY3Rpdml0aWVzLiAgCgojIyMgU28gdG9ucyBvZiBpbnRlcmVzdGluZyBxdWVzdGlvbnMgdG8gYW5zd2VyIAoKYW5kIEknbSBzdXBlciBJJ2xsIGNvbWUgdXAgd2l0aCBtb3JlIGJ1dCB0aGUgbmV4dCBzdGVwIGhlcmUgaXMgdG8gZmlndXJlIG91dCBhbGwgdGhlc2UgY2hhcmFjdGVycycgam9icyB3aGljaCBsZWQgbWUgdG8gcHJvYmxlbSAyCgoKIyMjIFByb2JsZW0gMjogVGhlIGpvYiBnZXR0aW5nIGZ1bmN0aW9uCgpUaGUgZm9sbG93aW5nIGZ1bmN0aW9uIHByb2R1Y2VzIGEgbGlzdCBvZiBqb2JzIHNjcmFwZWQgZnJvbSBkYyB3aWtpYSBmb3IgdGhlIGZpcnN0IDIwMCBjaGFyYWN0ZXJzIG9uIHRoZSBkYyBsaXN0LiAgCgpJdCdzIG5vdCAxMDAlIHBlcmZlY3QgYnV0IEkgd2FzIHBsZWFzYW50bHkgc3VycHJpc2VkIGJ5IHRoZSByZXN1bHRzIGdpdmVuIHRoZSBmYWlybHkgZ2VuZXJpYyBodG1sIG5vZGUgCgpGaXJzdCBJJ2xsIHRhbGsgYWJvdXQgdGhlIHByb2JsZW1zIChtb3N0IG9mIHdoaWNoIHNlZW0gcHJldHR5IHNvbHZhYmxlKToKCkZpcnN0LCB0aGUgb2J2aW91czogdGhlcmUgYXJlIGFib3V0IH4zMCBjaGFyYWN0ZXJzIG1pc3NpbmcgYW4gb2NjdXBhdGlvbiBmaWVsZC4gIEZvciBzb21lIGl0IGlzIGJlY2F1c2UgdGhlIG5vZGUgaXMgYSBiaXQgZGlmZmVyZW50LCBmb3Igc29tZSB0aGUgdXJsIGdlbmVyYXRlZCBmcm9tIHRoZSAidXJsc2x1ZyIgZmllbGQgcmV0dXJuZWQgYSA0MDQuICBJJ2xsIGV4YW1pbmUgdGhvc2UgbW9yZSBjbG9zZWx5IHRoaXMgd2VlaywgYnV0IHRoZSByZWxhdGl2ZWx5IHNtYWxsIG51bWJlciBtYWtlcyBtZSBhIGxpdHRsZSBsZXNzIGF2ZXJzZSB0byBkb2luZyB0aG9zZSBieSBoYW5kCgpTZWNvbmQsIHNvbWUgb2YgdGhlIHJlc3VsdHMgc2VlbSB0byBiZSBmcm9tIGEgZGlmZmVyZW50IGZpZWxkLiAgTm90IHN1cmUgaG93IG1hbnkgb2YgdGhlc2UgKGFsdGhvdWdoIGl0IGRvZXNuJ3Qgc2VlbSB0byBiZSBtYW55KSBsb29rIHRvIGJlIG1hcml0YWwgc3RhdHVzZXMuICBOb3QgMTAwJSBzdXJwcmlzZWQgZ2l2ZW4gbWFyaXRhbCBzdGF0dXMgaXMgZ2VuZXJhbGx5IGNsb3NlIHRvIG9jY3VwYXRpb24gb24gdGhlIHBhZ2UgYnV0IHN0aWxsIGEgYml0IGRpc2FwcG9pbnRlZCBub25ldGhlbGVzcyAKClRoaXJkLCB0aGVyZSdzIHN0aWxsIHNvbWUgd29yayB0byBiZSBkb25lIHN0YW5kYXJkaXppbmcgdGhlIGZpZWxkLiAgU29tZSBqb2JzIGFyZSBzZXBhcmF0ZWQgYnkgIi4iLCB3aGlsZSBzb21lIGFyZSBzZXBhcmF0ZWQgYnkgIiwiLiAgCgpBbnl3YXlzLCBJIHRoaW5rIEknbSBvZmYgdG8gYSBnb29kIHN0YXJ0IGhlcmUgYW5kIHRoZSB3b3JrIHRoaXMgd2VlayB3aWxsIG1vc3RseSByZXZvbHZlIGFyb3VuZCByZWZpbmluZyB0aGUgc2NyYXBpbmcgZnVuY3Rpb24gYW5kIHRoZW4gaG9wZWZ1bGx5IGp1bXBpbmcgaW50byBzb21lIGFuYWx5c2lzCgpgYGB7cn0KCnBhZ2U8LSAoZGNfdGVzdCRmdWxsX3VybFsxOjIwMF0pCgoKCmdkeGcgPC0gbGFwcGx5KHBhZ2UsIGZ1bmN0aW9uKGkpIHsKICAKIHRyeUNhdGNoKAogIGkgJT4lCiAgICByZWFkX2h0bWwgJT4lCiAgICBodG1sX25vZGVzKCIucGktaXRlbS1zcGFjaW5nKyAucGktYm9yZGVyLWNvbG9yIC5waS1ib3JkZXItY29sb3I6bnRoLWNoaWxkKDYpIC5waS1mb250IikgJT4lIAogICAgaHRtbF90ZXh0KCksCiAgZXJyb3IgPSBmdW5jdGlvbihlKXtOQX0gIAogKQp9KQoKCmBgYA==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ29taWMgQm9vayBKb3VybmFsIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgoKYGBge3J9CmxpYnJhcnkocmVhZHIpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkodGlkeXIpCmxpYnJhcnkobHVicmlkYXRlKQpsaWJyYXJ5KGphbml0b3IpCmxpYnJhcnkocnZlc3QpCmxpYnJhcnkoZ2x1ZSkKbGlicmFyeShwdXJycikKbGlicmFyeSh0aWJibGUpCmBgYAojIyBPa2F5IFdoYXQgRG8gSSBEbz8KClRoZSBjb21taWMgYm9vayBkYXRhIHByb3ZpZGVzIGEgZmV3IGludGVyZXN0aW5nIGlkZWFzLiAgCgpUaGUgb3JpZ2luYWwgcGllY2UgdGhpcyBkYXRhIHdhcyB1c2VkIGZvciBpcyBhYm91dCB0aGUgZXZvbHV0aW9uIG9mIHJlcHJlc2VudGF0aW9uIG9mIGdlbmRlciBhbmQgc2V4dWFsaXR5IG92ZXIgdGhlIHllYXJzIGluIE1hcnZlbCBhbmQgREMgY29taWNzLgoKSSdsbCB0cnkgbm90IHRvIHJlcGVhdCB0aGlzIGlkZWEsIGJ1dCBpbiBkb2luZyBzbyBJIHJ1biBpbnRvIG15IGZpcnN0IHByb2JsZW06IAoKIyMjIFByb2JsZW0gMTogVGhlIFZhcmlhYmxlcyBhcmUgYSBCaXQgRHVsbAoKSWYgSSdtIGdvaW5nIHRvIGdvIGluIGEgZGlmZmVyZW50IGRpcmVjdGlvbiwgdGhlIHZhcmlhYmxlcyBhcmVuJ3QgdGhlIGJlc3QuICBUaGV5IGdpdmUgbWUgYSBuaWNlIHN0YXJ0aW5nIHBvaW50LCBidXQgSSdtIGdvaW5nIHRvIGhhdmUgdG8gZG8gYSBsaXR0bGUgbW9yZSB3b3JrIGlmIEkgd2FudCB0byBkbyBzb21lIG9yaWdpbmFsIGFuYWx5c2lzLiAgCgpTdHVmZiBsaWtlICJBTElHTiIgKHdoZXRoZXIgdGhlIGNoYXJhY3RlciBpcyBnb29kIG9yIGV2aWwpLCAiQVBQRUFSQU5DRVMiLCAiWUVBUiIgKHllYXIgb2YgZmlyc3QgYXBwZWFyYW5jZSksICJTRVgiLCBhbmQgIm5hbWUiIGNvdWxkIHByb3ZlIHRvIGJlIHZhbHVhYmxlLCBidXQgdGhlIGJpZ2dlc3QgZ2lmdCBmcm9tIHRoaXMgZGF0YXNldCBpcyB0aGUgInNsdWciIHZhcmlhYmxlLCB3aGljaCBzaG91bGQgZ2l2ZSBtZSBhbiBlYXN5IHdheSB0byB1c2UgcnZlc3QgdG8gaXRlcmF0ZSB0aHJvdWdoIGNoYXJhY3RlcnMnIFVSTHMgdG8gbG9vayBmb3IgbW9yZSBtb3JlIGludGVyZXN0aW5nIHZhcmlhYmxlcy4KCmBgYHtyfQpkY19kYXRhIDwtIHJlYWRfY3N2KCJkYXRhL2RjLXdpa2lhLWRhdGEuY3N2IikKCm1hcnZlbF9kYXRhIDwtIHJlYWRfY3N2KCJkYXRhL21hcnZlbC13aWtpYS1kYXRhLmNzdiIpCgpkY19kYXRhICU+JQogIGNvbG5hbWVzKCkKYGBgCgpMZXQncyBjcmVhdGUgYSBuZXcgZGF0YWZyYW1lIHdpdGggYSAiZnVsbF91cmwiIGNvbHVtbiAKCmBgYHtyfQoKZGNfdXJsIDwtICJodHRwczovL2RjLmZhbmRvbS5jb20iCgpkY190ZXN0IDwtIGRjX2RhdGEgJT4lCiAgbXV0YXRlKHNsdWcgPSBnc3ViKCIoW1xcXSkiLCIiLCBkY19kYXRhJHVybHNsdWcpKSAlPiUKICBzZWxlY3QobmFtZSwgc2x1ZykgJT4lCiAgbXV0YXRlKGZ1bGxfdXJsID0gcGFzdGUwKGRjX3VybCwgc2x1ZykpCgoKYGBgCgoKIyMgTXkgRmlyc3QgSWRlYTogV2hhdCBEbyBTdXBlcmhlcm9lcyBEbyBXaGVuIFRoZXkncmUgTm90IEJlaW5nIFN1cGVyaGVyb2VzPwoKT25lIG9mIHRoZSB2YXJpYWJsZXMgdGhhdCBjYXVnaHQgbXkgZXllIGVhcmx5IChhZnRlciBJIHNwZW50IGEgZmV3IG1pbnV0ZXMgbXVzaW5nIG9uIHdoZXRoZXIgaGVpZ2h0IGFuZCB3ZWlnaHQgd2FzIGVub3VnaCB0byBhc3NlbWJsZSBhIHN1cGVyaGVybyBiYXNrZXRiYWxsIHRlYW0gZm9yIGVhY2ggdW5pdmVyc2UpIHdhcyB0aGUgIm9jY3VwYXRpb24iIGZpZWxkIGxpc3RlZCBvbiBtYW55IG9mIHRoZSBzdXBlcmhlcm8gd2lraWEgcGFnZXMuICAKCkkgZm91bmQgdGhpcyBhIHJlYWxseSBpbnRlcmVzdGluZyBmb3IgYSBmZXcgcmVhc29uczoKCjEpIEl0J3MgYW4gZWFzeSB3YXkgb2YgYXNjcmliaW5nIGNsYXNzIHRvIGNvbWljIGJvb2sgY2hhcmFjdGVycy4gQ2xhc3MgaXNuJ3Qgc29tZXRoaW5nIHRoYXQncyBtZW50aW9uZWQgYWxsIHRoYXQgb2Z0ZW4gaW4gY29taWMgYm9va3MgKGF0IGxlYXN0IGFzIGZhciBhcyBJIGtub3cpLiAgUGFydCBvZiB0aGUgcmVhc29uIHN1cGVyaGVyb2VzIGluc3BpcmUgc28gbWFueSBvZiB1cyBpcyBiZWNhdXNlIHN1cGVycG93ZXJzIHJlbW92ZSByZXNvdXJjZXMgYXMgYSBjb25zdHJhaW50IG9uIHBvdGVudGlhbC4gIFN1cGVyaGVyb2VzIGNhbiBvZnRlbiBwdW5jaCBhbmQga2ljayB0aGVpciB3YXkgb3V0IG9mIHByb2JsZW1zIHRoYXQgd291bGQgYmUgZmFyIG1vcmUgY29tcGxpY2F0ZWQgZm9yIG5vcm1hbCBwZW9wbGUuICBCdXQgaXQgbWFrZXMgbWUgd29uZGVyLCBpcyB0aGVyZSBhIGNsZWFyIGRpc3RpbmN0aW9uIG9mIGNsYXNzZXMgYW1vbmcgc3VwZXJoZXJvZXM/ICBBcmUgdGhlcmUgcG9vciBzdXBlcmhlcm9lcz8gIEFyZSBtb3JlIHZpbGxhaW5zIHBvb3I/ICAKCjIpIEl0IGdpdmVzIGEgY2hhcmFjdGVyIGFkZGl0aW9uYWwgZGVwdGguICBTcGlkZXItTWFuIGlzIGEgd29uZGVyZnVsIGV4YW1wbGUgb2YgdGhpcy4gIEhlIGlzIGEgbW9yZSBlZmZlY3RpdmUgY2hhcmFjdGVyIGJlY2F1c2UgaGUgaXMgYSBub3JtYWwgcGVyc29uIHdobyB3ZSBvZnRlbiBzZWUgZ29pbmcgdG8gc2Nob29sIGFuZCB3b3JraW5nIGpvYnMuICBXZSBzZWUgdGhlIHBlcnNvbmFsIHNhY3JpZmljZXMgUGV0ZXIgUGFya2VyIG1ha2VzIGluIHRlcm1zIG9mIGhpcyB0aW1lIGFuZCByZXNwb25zaWJpbGl0aWVzIHRvIGZpZ2h0IGNyaW1lLCBzbyBlYWNoIHRpbWUgaGUgYm9sdHMgb3V0IG9mIGEgcm9vbSB0byBzdWl0IHVwLCBpdCBmZWVscyBpbXBhY3RmdWwgYmVjYXVzZSB3ZSBjYW4gYWxsIHJlbGF0ZSB0byB0aGF0IGtpbmQgb2Ygc2FjcmlmaWNlLiAgCgozKSBIb3cgbWFueSBqb2JzIGNhbiB5b3Ugd29yayBhbmQgc3RpbGwgZmlnaHQgY3JpbWU6IE9uZSBvZiB0aGUgZmlyc3QgdGhpbmdzIEkgbm90aWNlZCB3YXMgdGhhdCBtYW55IGNoYXJhY3RlcnMgaGFkIG11bHRpcGxlIGpvYnMuICBJdCBtYWRlIG1lIHdvbmRlciBhYm91dCB0aGUgdHlwaWNhbCB0aW1lIGNvbW1pdG1lbnQgZm9yIHN1cGVyaGVybyBhY3Rpdml0aWVzLiAgCgojIyMgU28gdG9ucyBvZiBpbnRlcmVzdGluZyBxdWVzdGlvbnMgdG8gYW5zd2VyIAoKYW5kIEknbSBzdXBlciBJJ2xsIGNvbWUgdXAgd2l0aCBtb3JlIGJ1dCB0aGUgbmV4dCBzdGVwIGhlcmUgaXMgdG8gZmlndXJlIG91dCBhbGwgdGhlc2UgY2hhcmFjdGVycycgam9icyB3aGljaCBsZWQgbWUgdG8gcHJvYmxlbSAyCgoKIyMjIFByb2JsZW0gMjogVGhlIGpvYiBnZXR0aW5nIGZ1bmN0aW9uCgpUaGUgZm9sbG93aW5nIGZ1bmN0aW9uIHByb2R1Y2VzIGEgbGlzdCBvZiBqb2JzIHNjcmFwZWQgZnJvbSBkYyB3aWtpYSBmb3IgdGhlIGZpcnN0IDIwMCBjaGFyYWN0ZXJzIG9uIHRoZSBkYyBsaXN0LiAgCgpJdCdzIG5vdCAxMDAlIHBlcmZlY3QgYnV0IEkgd2FzIHBsZWFzYW50bHkgc3VycHJpc2VkIGJ5IHRoZSByZXN1bHRzIGdpdmVuIHRoZSBmYWlybHkgZ2VuZXJpYyBodG1sIG5vZGUgCgpGaXJzdCBJJ2xsIHRhbGsgYWJvdXQgdGhlIHByb2JsZW1zIChtb3N0IG9mIHdoaWNoIHNlZW0gcHJldHR5IHNvbHZhYmxlKToKCkZpcnN0LCB0aGUgb2J2aW91czogdGhlcmUgYXJlIGFib3V0IH4zMCBjaGFyYWN0ZXJzIG1pc3NpbmcgYW4gb2NjdXBhdGlvbiBmaWVsZC4gIEZvciBzb21lIGl0IGlzIGJlY2F1c2UgdGhlIG5vZGUgaXMgYSBiaXQgZGlmZmVyZW50LCBmb3Igc29tZSB0aGUgdXJsIGdlbmVyYXRlZCBmcm9tIHRoZSAidXJsc2x1ZyIgZmllbGQgcmV0dXJuZWQgYSA0MDQuICBJJ2xsIGV4YW1pbmUgdGhvc2UgbW9yZSBjbG9zZWx5IHRoaXMgd2VlaywgYnV0IHRoZSByZWxhdGl2ZWx5IHNtYWxsIG51bWJlciBtYWtlcyBtZSBhIGxpdHRsZSBsZXNzIGF2ZXJzZSB0byBkb2luZyB0aG9zZSBieSBoYW5kCgpTZWNvbmQsIHNvbWUgb2YgdGhlIHJlc3VsdHMgc2VlbSB0byBiZSBmcm9tIGEgZGlmZmVyZW50IGZpZWxkLiAgTm90IHN1cmUgaG93IG1hbnkgb2YgdGhlc2UgKGFsdGhvdWdoIGl0IGRvZXNuJ3Qgc2VlbSB0byBiZSBtYW55KSBsb29rIHRvIGJlIG1hcml0YWwgc3RhdHVzZXMuICBOb3QgMTAwJSBzdXJwcmlzZWQgZ2l2ZW4gbWFyaXRhbCBzdGF0dXMgaXMgZ2VuZXJhbGx5IGNsb3NlIHRvIG9jY3VwYXRpb24gb24gdGhlIHBhZ2UgYnV0IHN0aWxsIGEgYml0IGRpc2FwcG9pbnRlZCBub25ldGhlbGVzcyAKClRoaXJkLCB0aGVyZSdzIHN0aWxsIHNvbWUgd29yayB0byBiZSBkb25lIHN0YW5kYXJkaXppbmcgdGhlIGZpZWxkLiAgU29tZSBqb2JzIGFyZSBzZXBhcmF0ZWQgYnkgIi4iLCB3aGlsZSBzb21lIGFyZSBzZXBhcmF0ZWQgYnkgIiwiLiAgCgpBbnl3YXlzLCBJIHRoaW5rIEknbSBvZmYgdG8gYSBnb29kIHN0YXJ0IGhlcmUgYW5kIHRoZSB3b3JrIHRoaXMgd2VlayB3aWxsIG1vc3RseSByZXZvbHZlIGFyb3VuZCByZWZpbmluZyB0aGUgc2NyYXBpbmcgZnVuY3Rpb24gYW5kIHRoZW4gaG9wZWZ1bGx5IGp1bXBpbmcgaW50byBzb21lIGFuYWx5c2lzCgpgYGB7cn0KCnBhZ2U8LSAoZGNfdGVzdCRmdWxsX3VybCkKCgoKZ2R4ZyA8LSBsYXBwbHkocGFnZSwgZnVuY3Rpb24oaSkgewogIAogdHJ5Q2F0Y2goCiAgaSAlPiUKICAgIHJlYWRfaHRtbCAlPiUKICAgIGh0bWxfbm9kZXMoIi5waS1pdGVtLXNwYWNpbmcrIC5waS1ib3JkZXItY29sb3IgLnBpLWJvcmRlci1jb2xvcjpudGgtY2hpbGQoNikgLnBpLWZvbnQiKSAlPiUgCiAgICBodG1sX3RleHQoKSwKICBlcnJvciA9IGZ1bmN0aW9uKGUpe05BfSAgCiApCn0pCgoKZ2R4Z1tsZW5ndGhzKGdkeGcpID09IDBdIDwtIE5BX2NoYXJhY3Rlcl8KCmhlcm9fam9ic190ZXN0IDwtIHVubGlzdChnZHhnKQoKZGNfZGF0YSRqb2IgPC0gaGVyb19qb2JzX3Rlc3QKCmhlcm9fam9ic190ZXN0CgoKam9ic190ZXN0IDwtIGRjX2RhdGEgJT4lIAogIG11dGF0ZShqb2IgPSBzdHJfdG9fdXBwZXIoam9iKSkgJT4lCiAgbXV0YXRlKGpvYiA9IGNhc2Vfd2hlbihqb2IgPT0gIk1BUlJJRUQiIH4gTkFfY2hhcmFjdGVyXywKICAgICAgICAgICAgICAgICAgICAgICAgIGpvYiA9PSAiU0lOR0xFIiB+IE5BX2NoYXJhY3Rlcl8sCiAgICAgICAgICAgICAgICAgICAgICAgICBqb2IgPT0gIldJRE9XRUQiIH4gTkFfY2hhcmFjdGVyXywKICAgICAgICAgICAgICAgICAgICAgICAgIGpvYiA9PSAiRElWT1JDRUQiIH4gTkFfY2hhcmFjdGVyXywKICAgICAgICAgICAgICAgICAgICAgICAgIFRSVUUgfiBqb2IpLAogICAgICAgICBtYXJyaWVkID0gY2FzZV93aGVuKGpvYiA9PSAiTUFSUklFRCIgfiAiTUFSUklFRCIsCiAgICAgICAgICAgICAgICAgICAgICAgICBqb2IgPT0gIlNJTkdMRSIgfiAiU0lOR0xFIiwKICAgICAgICAgICAgICAgICAgICAgICAgIGpvYiA9PSAiV0lET1dFRCIgfiAiV0lET1dFRCIsCiAgICAgICAgICAgICAgICAgICAgICAgICBqb2IgPT0gIkRJVk9SQ0VEIiB+ICJESVZPUkNFRCIsCiAgICAgICAgICAgICAgICAgICAgICAgICBUUlVFIH4gTkFfY2hhcmFjdGVyXykpCgoKam9ic190ZXN0ICU+JQogIG11dGF0ZShqb2JfeWVzID0gY2FzZV93aGVuKCFpcy5uYShqb2IpIH4gImhhcyBqb2IiLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlzLm5hKGpvYikgfiAibm8gam9iIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUUlVFIH4gImh1aCIpKSAlPiUKICBncm91cF9ieShqb2JfeWVzKSAlPiUKICBjb3VudChzb3J0ID0gVCkgCgpqb2JzX3Rlc3QkZnVsbF91cmwgPC0gZGNfdGVzdCRmdWxsX3VybAoKbWlzc2luZ19qb2JzIDwtIGpvYnNfdGVzdCAlPiUKICBmaWx0ZXIoaXMubmEoam9iKSkKCnBhZ2UyIDwtIG1pc3Npbmdfam9icyRmdWxsX3VybAoKcGFnZTIKCmdkeGcyIDwtIGxhcHBseShwYWdlMiwgZnVuY3Rpb24oaSkgewogIAogdHJ5Q2F0Y2goCiAgaSAlPiUKICAgIHJlYWRfaHRtbCAlPiUKICAgIGh0bWxfbm9kZXMoIi5waS1ncm91cCAucGktYm9yZGVyLWNvbG9yOm50aC1jaGlsZCg3KSAucGktZm9udCIpICU+JSAKICAgIGh0bWxfdGV4dCgpLAogIGVycm9yID0gZnVuY3Rpb24oZSl7TkF9ICAKICkKfSkKCmdkeGcyCgpnZHhnMltsZW5ndGhzKGdkeGcpID09IDBdIDwtIE5BX2NoYXJhY3Rlcl8KCmhlcm9fam9ic190ZXN0MiA8LSB1bmxpc3QoZ2R4ZzIpCgpoZXJvX2pvYnNfdGVzdAoKZGNfZGF0YSRqb2IgPC0gaGVyb19qb2JzX3Rlc3QyCgpoZXJvX2pvYnNfdGVzdDIKCgoKCgpgYGAKIyBUaGUgSGVybyBFY29ub215CldoYXQgYXJlIHRoZSBtb3N0IGNvbW1vbiBqb2JzIGFtb25nIGNvbWljIGJvb2sgY2hhcmFjdGVycz8KYGBge3J9Cgptb3N0X2NvbW1vbl9qb2JzIDwtIGpvYnNfdGVzdCAlPiUKICBmaWx0ZXIoIWlzLm5hKGpvYikpICU+JQogIGdyb3VwX2J5KGpvYikgJT4lCiAgY291bnQoc29ydCA9IFQpICU+JQogIGhlYWQoMjApCgptb3N0X2NvbW1vbl9qb2JzCgpsZWFzdF9jb21tb25fam9icyA8LSBqb2JzX3Rlc3QgJT4lCiAgZmlsdGVyKCFpcy5uYShqb2IpKSAlPiUKICBncm91cF9ieShqb2IpICU+JQogIGNvdW50KHNvcnQgPSBUKSAlPiUKICB0YWlsKDIwKQpgYGAKCldoYXQgYXJlIHRoZSBtb3N0IGNvbW1vbiBqb2JzIGFtb25nICJnb29kIGNoYXJhY3RlcnMiIGFuZCAiYmFkIGNoYXJhY3RlcnMiCgpNb3N0IGludGVyZXN0aW5nIHRoaW5nIHRvIG1lIGhlcmUgaXMgJ2dvb2QgY2hhcmFjdGVyJyBhcmUgYSBsb3QgbGVzcyBkZWZpbmVkIGJ5IHRoZWlyIGpvYnMuICAnQmFkIGNoYXJhY3RlcnMnIG1vc3RseSBkbyBjcmltZSBmdWxsLXRpbWUuICBXaGlsZSB0aGUgbWV0aG9kIG9mIGNyaW1lIG1pZ2h0IGNoYW5nZSAoZS5nLiAnbW9ic3RlcicsICd0ZXJyb3Jpc3QnLCdjcmltZWxvcmQnKSBtb3N0ICdiYWQgY2hhcmFjdGVyJyBqb2JzIGFyZSBkZWZpbmVkIGJ5IGRvaW5nIGNyaW1lIGFuZC9vciB2aW9sZW5jZS4gIApgYGB7cn0KbW9zdF9jb21tb25fam9ic19oZXJvZXMgPC0gam9ic190ZXN0ICU+JQogIGZpbHRlcighaXMubmEoam9iKSwKICAgICAgICAgQUxJR04gPT0gIkdvb2QgQ2hhcmFjdGVycyIpICU+JQogIGdyb3VwX2J5KGpvYikgJT4lCiAgY291bnQoc29ydCA9IFQpICU+JQogIGhlYWQoMjApCgptb3N0X2NvbW1vbl9qb2JzX2hlcm9lcwoKbW9zdF9jb21tb25fam9ic192aWxsYWlucyA8LSBqb2JzX3Rlc3QgJT4lCiAgZmlsdGVyKCFpcy5uYShqb2IpLAogICAgICAgICBBTElHTiA9PSAiQmFkIENoYXJhY3RlcnMiKSAlPiUKICBncm91cF9ieShqb2IpICU+JQogIGNvdW50KHNvcnQgPSBUKSAlPiUKICBoZWFkKDIwKQoKbW9zdF9jb21tb25fam9ic192aWxsYWlucwoKCmBgYAoKIyBIYXJkIFdvcmtlcnMgCmhvdyBvZnRlbiBkbyBjb21taWMgYm9vayBjaGFyYWN0ZXJzIGhhdmUgbXVsdGlwbGUgam9icyA/CmBgYHtyfQpqb2JzX3Rlc3QgJT4lCiAgZmlsdGVyKCFpcy5uYShqb2IpKSAlPiUKICBtdXRhdGUoam9iID0gc3RyX3JlcGxhY2VfYWxsKGpvYiwiwrciLCAiLCIpKSAlPiUKICBtdXRhdGUobl9qb2JzID0gY2FzZV93aGVuKHN0cl9jb3VudChqb2IsICIsIikgPT0gMCB+ICIxIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMSB+ICIyIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMiB+ICIzIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMyB+ICI0IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gNCB+ICI1IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRSVUUgfiBOQV9jaGFyYWN0ZXJfCiAgICAgICAgICAgICAgICAgICAgICAgICAgICApKSAlPiUKICBzZWxlY3QobmFtZSwgam9iLCBuX2pvYnMsIEFMSUdOKSAlPiUKICBncm91cF9ieShuX2pvYnMpICU+JQogIGNvdW50KHNvcnQgPSBUKQoKbXVsdGlfam9iX2NoYXJhY3RlcnMgPC0gICBqb2JzX3Rlc3QgJT4lCiAgZmlsdGVyKCFpcy5uYShqb2IpKSAlPiUKICBtdXRhdGUoam9iID0gc3RyX3JlcGxhY2VfYWxsKGpvYiwiwrciLCAiLCIpKSAlPiUKICBtdXRhdGUobl9qb2JzID0gY2FzZV93aGVuKHN0cl9jb3VudChqb2IsICIsIikgPT0gMCB+ICIxIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMSB+ICIyIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMiB+ICIzIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gMyB+ICI0IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cl9jb3VudChqb2IsICIsIikgPT0gNCB+ICI1IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRSVUUgfiBOQV9jaGFyYWN0ZXJfCiAgICAgICAgICAgICAgICAgICAgICAgICAgICApKSAlPiUKICBtdXRhdGUobl9qb2JzID0gYXMuZG91YmxlKG5fam9icykpICU+JQogIHNlbGVjdChuYW1lLCBqb2IsIG5fam9icywgQUxJR04pICU+JQogIGZpbHRlcihuX2pvYnMgPiAxKQoKCgoKCgoKYGBgCgojIEpvYiBBbmFseXNpcyAKCkpvYnMgb2Z0ZW4gYWN0IGFzIGEgd2F5IHRvIHNpZ25hbCBhIGNoYXJhY3RlcidzIG1vcmFsaXR5LiAgVGhlcmUgYXJlIGNlcnRhaW4gam9icyBpbiBvdXIgc29jaWV0eSB0aGF0IGFyZSBtb3JlIGFzc29jaWF0ZWQgd2l0aCAnZ29vZCcgb3IgJ2JhZCcgYmVoYXZpb3IgYW5kIHdyaXRlcnMgdGFrZSBhZHZhbnRhZ2Ugb2YgdGhpcyBmb3IgZXhwb3NpdGlvbi4KCkNhc2UgaW4gcG9pbnQgLS0gUG9saWNlIG9mZmljZXIgY2hhcmFjdGVyczoKYGBge3J9Cgpqb2JzX3Rlc3QgJT4lCiAgZ3JvdXBfYnkoam9iKSAlPiUKICBmaWx0ZXIoam9iID09ICJQT0xJQ0UgT0ZGSUNFUiIpICU+JQogIGNvdW50KEFMSUdOLCBzb3J0ID0gVCkKCmpvYnNfdGVzdCAlPiUKICBncm91cF9ieShqb2IpICU+JQogIGZpbHRlcihqb2IgPT0gIkNSSU1JTkFMIikgJT4lCiAgY291bnQoQUxJR04sIHNvcnQgPSBUKQoKCmBgYAoKTm90IGV2ZXJ5dGhpbmcgaXMgYmxhY2sgYW5kIHdoaXRlIHRob3VnaC4gIEZvciBleGFtcGxlLCBzY2llbnRpc3QKCmBgYHtyfQpqb2JzX3Rlc3QgJT4lCiAgZ3JvdXBfYnkoam9iKSAlPiUKICBmaWx0ZXIoam9iID09ICJTQ0lFTlRJU1QiKSAlPiUKICBjb3VudChBTElHTiwgc29ydCA9IFQpCgoKCmBgYAoKIyBOZXh0IHN0b3AsIHBlcmZvcm0gdGhpcyBhbmFseXNpcyBhdCBzY2FsZSBhbmQgZG8gc29tZSBtb3JlIGRhdGEgdml6CgpJIHRoaW5rIHRoZSAnc3RvcnknIGVsZW1lbnQgb2YgdGhpcyBwcm9qZWN0IHdpbGwgbW9zdGx5IGhpbmdlIG9mIHRoZSBraW5kIG9mIGpvYiBhbmFseXNpcyBJIHBlcmZvcm0gYWJvdmUsIGJ1dCBJJ2QgYWxzbyBsaWtlIHRvIGFkZCBhIGxpdHRsZSBtb3JlIHNvcGhpc3RpY2F0aW9uIGluIGEgZmV3IHdheXMgCgoxKSBtb3JlIGRhdGEgdml6LiAgSSdtIHRoaW5raW5nIEknbSBnb2luZyB0byBkaXNwbGF5IG15IGpvYiBhbmFseXNpcyBhcyBhIHNlcmllcyBvZiBzdGFja2VkIGJhciBjaGFydHMuICBXb3VsZCBiZSBhIG11Y2ggbW9yZSBlZmZpY2llbnQgd2F5IG9mIGRpc3BsYXlpbmcgdGhhdCBpbmZvLiAgQWxzbyBwbGFubmluZyBvbiBhZGRpbmcgYSB0aW1lbGluZSBzaG93aW5nIHRoZSBwcmV2YWxlbmNlIG9mIGRpZmZlcmVudCB0eXBlcyBvZiBqb2JzIGJ5IHllYXIvZGVjYWRlLiAgVGhlIGhhbmd1cCB0aGVyZSBpcyBjcmVhdGluZyBuZWF0IGpvYiBjYXRlZ29yaWVzIHRvIGZpdCBhcyBtYW55IG9mIHRoZSBodW5kcmVkcyBvZiB1bmlxdWUgam9icyBpbiB0aGUgZGF0YSBhcyBJIGNhbi4gIAoKMikgU2NhbGUuICBJIHdhbnQgdG8gc2VlIGlmIEkgY2FuIHdyaW5nIGEgaGlnaGVyIG51bWJlciBvZiBkYyBjaGFyYWN0ZXIgam9icyBmcm9tIHRoYXQgZGF0YSBzZXQuICBJIGFsc28gbmVlZCB0byB0cnkgdG8gcnVuIHRoZSBzYW1lIGtpbmQgb2Ygc2NyYXBlciBvbiBtYXJ2ZWwgd2lraWEgdG8gcHJvZHVjZSByZXN1bHRzIGZvciBtYXJ2ZWwgY2hhcmFjdGVycyBzbyBJIGNhbiBjb21wYXJlIHRoZSB0d28uICBJIHRoaW5rIEkgY291bGQgcHJvZHVjZSB2aWFibGUgYW5hbHlzaXMgd2l0aCB0aGUgbmVhciAyLDAwMCBjaGFyYWN0ZXJzIEkgZG8gaGF2ZSBqb2IgZGF0YSBvbiwgYnV0IG1vcmUgd291bGQgY2VydGFpbmx5IGJlIGJldHRlciBlc3BlY2lhbGx5IGJlY2F1c2UgaXQgd2lsbCBhbGxvdyBtZSB0byBjb21wYXJlIHR3byBkaWZmZXJlbnQgY29taWMgYm9vayBjb21wYW5pZXMuIAo=</div>
 
 
 
