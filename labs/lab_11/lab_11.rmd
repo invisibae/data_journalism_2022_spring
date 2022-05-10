@@ -70,6 +70,10 @@ wv_county_pop <- wv_county_pop  %>%
   rename(population = estimate) %>%
   select(COUNTY, population, geometry)
 
+wv_county_pop
+
+wv_mining_summary
+
 # group_by/summarise to get summary columns for loan amount and number of loans for each county
 wv_mining_summary <- wv_mining %>%
   group_by(project_county_name) %>%
@@ -78,9 +82,13 @@ wv_mining_summary <- wv_mining %>%
   arrange(desc(total_loan_amount)) %>%
   rename(COUNTY = project_county_name)
 
+
+
 #join to begin the process of getting numbers per 100k
 wv_mining_summary <- wv_mining_summary %>%
   right_join(wv_county_pop, by= "COUNTY")
+
+wv_mining_summary
 
 # get numbers per 100k
 wv_mining_per_100k <- wv_mining_summary %>%

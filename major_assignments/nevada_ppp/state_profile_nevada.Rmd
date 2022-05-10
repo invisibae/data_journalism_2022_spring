@@ -18,9 +18,19 @@ The deliverable will be this R Markdown notebook and a data folder that you will
 **Task** Create a codeblock and load appropriate packages and settings for this assignment.
 
 ```{r}
+
+library(tidyverse)
+library(scales)
+library(tidycensus)
+library(tidycensus)
+library(sf)
+library(knitr)
+
 setwd("/Users/gregorymorton/Documents/GitHub/data_journalism_2022_spring/major_assignments/nevada_ppp")
 
 nevada_ppp <- read_csv("data/nevada_ppp.csv")
+
+naics_codes <- read_csv("data/naics_codes.csv")
 
 ```
 
@@ -28,13 +38,163 @@ nevada_ppp <- read_csv("data/nevada_ppp.csv")
 
 **Q1.**. Write R code that generates some basic descriptive statistics that allows you to describe the applications from your state. This code should produce results that describe the data in different ways: how many applications there are, along with ways to understand the typical and most frequent values for columns you find interesting or newsworthy. You should produce at least five (5) descriptive statistics and write up a summary of the data using them.
 
+**A1.** 
 ```{r}
+# Starting with boring cleaning stuff 
+
+
+nevada_ppp <- nevada_ppp %>% 
+  mutate(city = str_to_upper(city)) %>%
+  mutate(city = case_when(city == "N LAS VEGAS" ~ "NORTH LAS VEGAS",
+                          city == "N. LAS VEGAS" ~ "NORTH LAS VEGAS",
+                          city == "NO LAS VEGAS" ~ "NORTH LAS VEGAS",
+                          city == "S LAS VEGAS" ~ "SOUTH LAS VEGAS",
+                          city == "LAS VEGAS," ~ "LAS VEGAS",
+                          city == "LAS VEGAS NV" ~ "LAS VEGAS",
+                          TRUE ~ city)) %>%
+  left_join(naics_codes, by = "naics_code") %>%
+  mutate(naics_code = as.character(naics_code)) 
+
+
+
+```
+
+#Next let's find out where most of the loans are going 
+Pretty much chalk in terms of loan volume.  VAST majority of loans going to the Vegas area with a sprinkling in Reno and few elsewhere in the state 
+```{r}
+nevada_ppp %>%
+  group_by(city) %>% 
+  count(sort = T)
+```
+
+
+# Next going to generate a slightly more comprehensive city summary
+
+```{r}
+city_summary <- nevada_ppp %>% 
+  group_by(city) %>% 
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            jobs_retained = sum(jobs_retained),
+            amount_per_job_retained = sum / jobs_retained,
+            n = n()) %>%
+  mutate(n = as.double(n)) %>%
+  arrange(desc(n)) %>%
+  ungroup() 
+
+city_summary
+```
+
+```{r}
+vegas_metro <- city_summary %>%
+  filter(n > 5) %>%
+  filter(str_detect(city, "LAS VEGAS") | str_detect(city, "HENDERSON") | str_detect(city, "SPRING VALLEY") | str_detect(city, "SUMMERLIN") | str_detect(city, "PARADISE") | str_detect(city, "ENTERPRISE")) %>%
+  arrange(desc(n))
+
+
+vegas_metro
+```
+## Vegas vs Not Vegas
+
+worth noting here just how much las vegas is dominating the rest of the state both in terms of total loans and total loan amount.  One interesting thing here is that the rest of Nevada had a higher median loan amount (but not by very much)
+```{r}
+vegas_vs_nv <- nevada_ppp %>%
+  mutate(vegas_or = case_when(city %in% vegas_metro$city ~ "Vegas (and Vegas suburbs)",
+                              TRUE ~ "Not Vegas")) %>%
+  group_by(vegas_or) %>%
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            jobs_retained = sum(jobs_retained),
+            amount_per_job_retained = sum / jobs_retained,
+            n = n()) %>%
+  mutate(n = as.double(n)) %>%
+  ungroup() %>%
+  arrange(desc(n))
+
+vegas_vs_nv
+```
+## Lets visualize that dichotomy 
+```{r}
+vegas_vs_nv %>%
+  ggplot() +
+  geom_col(aes(x = vegas_or, y = sum, fill = vegas_or)) +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_y_continuous(labels=dollar_format()) + 
+  labs(x = "",
+       y = "Total Received in PPP Loans") +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+```
+# When were loans in Nevada being approved?
+Pretty much no surprises here.  An enormous quantity of loans all at nearly the same exact time early in the pandemic and a smattering of loans in 2021.  
+```{r}
+
+loan_dates <- nevada_ppp %>%
+  group_by(date_approved) %>%
+  summarise(n = n()) 
+
+
+
+loan_dates %>%
+  ggplot +
+  geom_line(aes(x = date_approved, y = n, alpha = 0.75)) + 
+  theme_minimal() +
+  theme(legend.position = "none") 
 
 
 
 
 ```
-**A1.** 
+# Who got the state's largest loans?  Who got the most per job saved?
+I'm curious to know who the largest loans in the state. 
+
+```{r}
+
+biggest_loans <- nevada_ppp %>%
+  group_by(name, title) %>%
+  filter(jobs_retained > 5) %>%
+  summarise(sum = sum(amount),
+            jobs_retained = jobs_retained,
+            amount_per_job_retained = sum / sum(jobs_retained),
+            title = title) %>%
+  arrange(desc(sum)) 
+
+biggest_loans 
+```
+# Who as least efficient in retaining jobs?  Who was most efficient?
+```{r}
+
+most_per_job_retained <- nevada_ppp %>%
+  group_by(name, title) %>%
+  filter(jobs_retained > 5) %>%
+  summarise(sum = sum(amount),
+            jobs_retained = jobs_retained,
+            amount_per_job_retained = sum / sum(jobs_retained) ) %>%
+  arrange(desc(amount_per_job_retained))   
+  
+most_per_job_retained
+```
+
+Some of our 'most efficient businesses' seem to have made honest mistakes on their PPP applications.  Several businesses reported retaining the maximum 500 jobs while receiving nowhere near enough to pay 500 employees.
+```{r}
+
+least_per_job_retained <- nevada_ppp %>%
+  group_by(name, title) %>%
+  filter(jobs_retained > 5) %>%
+  summarise(sum = sum(amount),
+            jobs_retained = jobs_retained,
+            amount_per_job_retained = sum / sum(jobs_retained) ) %>%
+  arrange(amount_per_job_retained)  
+  
+least_per_job_retained
+
+```
+
+
+
 
 
 ## Geographic Analysis
@@ -42,26 +202,822 @@ nevada_ppp <- read_csv("data/nevada_ppp.csv")
 **Q2.** Write R code that examines geographic patterns for PPP loans in your state, using Census population information to calculate a per-capita figure for the state and counties and zip codes. Then, make a county map using ggplot showing the per-capita data and a zip code map showing the difference from the statewide per-capita figure. Describe the most interesting or newsworthy findings based on your exploration.
 
 **A2.** 
+```{r}
+
+calculate_mode <- function(x) {
+  uniqx <- unique(na.omit(x))
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+
+acs_variables <-load_variables(2017, "acs5", cache = TRUE) 
+
+
+
+nv_county_pop <- get_acs(geography = "county", 
+        variables = c(population = "B01001_001"), 
+        state = "NV", 
+        geometry = T) %>%
+  rename(project_county_name = NAME) %>%
+  mutate(project_county_name = toupper(str_remove_all(project_county_name, " County, Nevada"))) 
+
+
+nv_county_income <- get_acs(geography = "county", 
+        variables = c(median_income = "B07011_001"), 
+        state = "NV", 
+        geometry = T) %>%
+  rename(project_county_name = NAME) %>%
+  mutate(project_county_name = toupper(str_remove_all(project_county_name, " County, Nevada"))) 
+
+nv_county_income %>%
+  View()
+
+county_summary <- nevada_ppp %>% 
+  filter(project_state == "NV") %>%
+  group_by(project_county_name) %>% 
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            jobs_retained = sum(jobs_retained),
+            amount_per_job_retained = sum / jobs_retained,
+            most_common_industry = calculate_mode(title),
+            most_loaned_city = calculate_mode(city),
+            n = n()) %>%
+  mutate(n = as.double(n)) %>%
+  arrange(desc(n)) %>%
+  ungroup() %>%
+  left_join(nv_county_pop, by = "project_county_name") %>%
+  mutate(loans_per_capita = n / estimate,
+         loans_per_100k = (n / estimate) * 100000,
+         jobs_retained_per_100k = (jobs_retained / estimate) * 100000)
+
+```
+# County Summary
+Median Loan by county.  Interesting that while the Vegas area dominates loan volume, Clark County actually has the second lowest median loan amount in the state.
+
+```{r}
+
+county_summary
+
+```
+
+
+
+## Median Loan in Each Nevada County
+```{r}
+median_loan_map <- county_summary %>%
+  filter(!is.na(geometry)) %>%
+  ggplot() +
+  geom_sf(aes(fill=median, geometry = geometry)) +
+  geom_sf_text(data = county_summary, 
+               aes(label = project_county_name, geometry = geometry), 
+               size = 2, colour = "white") +
+  scale_fill_continuous(labels=dollar_format(), type = "viridis") +
+  theme_void()
+
+median_loan_map 
+
+
+
+
+```
+
+## Jobs Retained in Each NV County
+PPP Loans saved an incredible amount of jobs in Clark County.  According to the ACS data, nearly 1 in 4 people kept their jobs because of a PPP loan.  Probably what congress had in mind when they rushed all this money out of the door.  
+```{r}
+jobs_map <- county_summary %>%
+  filter(!is.na(geometry)) %>%
+  ggplot() +
+  geom_sf(aes(fill=jobs_retained_per_100k, geometry = geometry)) +
+  geom_sf_text(data = county_summary, 
+               aes(label = project_county_name, geometry = geometry), 
+               size = 2.2, colour = "black") +
+  scale_fill_distiller(palette = "YlOrBr",breaks = c(0, 10000, 20000), labels=comma_format()) +
+  theme_void()
+
+jobs_map
+
+
+
+```
+## Loans Per-100k in each NV County
+No surprise given what we know about Clark County that it dominated in terms of loans per 100k residents.  No other county is even close
+
+```{r}
+# Loans Per 100k
+loans_per_100k_map <- county_summary %>%
+  filter(!is.na(geometry)) %>%
+  ggplot() +
+  geom_sf(aes(fill=loans_per_100k, geometry = geometry)) +
+  geom_sf_text(data = county_summary, 
+               aes(label = project_county_name, geometry = geometry), 
+               size = 2.2, colour = "black") +
+  scale_fill_distiller(palette = "Greens", labels = comma_format()) +
+  theme_void()
+
+loans_per_100k_map
+
+
+
+```
+# Industries that Received the Most Loans in Each NV County
+For me, this was an unexpected outcome.  I expected to see restaurants and gambling dominant in the more populous parts of the state, but the most common type of business in Clark County is actually beauty salons.  This goes to show just how much of the PPP pot small business commanded. 
+
+```{r}
+
+industry_map <- county_summary %>%
+  filter(!is.na(geometry)) %>%
+  ggplot() +
+  geom_sf(aes(fill=most_common_industry, geometry = geometry)) +
+  geom_sf_text(data = county_summary, 
+               aes(label = project_county_name, geometry = geometry), 
+               size = 2, colour = "white") +
+  scale_fill_brewer(palette = "Dark2") +
+  theme_void()
+
+industry_map
+
+
+
+
+```
+
+
 
 ## Lender Analysis
 
 **Q3.** Write R code to examine which lenders had the most approved applications in your state (and include summary statistics such as total amount and average loan amount). Generate dataframes that show the number and total amount of all loans and undisbursed loans per lender. For those lenders who had any undisbursed loans, make a graphic showing the relationship between the total amount of loans and the total undisbursed amount. Describe the most noticeable outlier lenders on that graphic below.
 
-**A3.** 
+**A3.**: 
+# The Average NV PPP Loan
+```{r}
+
+
+nevada_loans <- nevada_ppp %>%
+  summarise(
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = mean(jobs_retained)
+            ) 
+
+nevada_loans
+
+```
+# Nevada's Top PPP Lenders 
+```{r}
+
+top_lenders <- nevada_ppp %>%
+  group_by(lender) %>%
+  summarise(n = n(),
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = mean(jobs_retained)
+            ) %>%
+  arrange(desc(n)) %>%
+  head(10)
+
+top_lenders
+
+```
+
+# When Did Top Lenders Disburse Loans?
+Now THIS is fascinating.  You would think that top lenders would be disbursing their loans at similar times given the dynamics of the pandemic.  What the data in "top_lenders" shows is that lenders seem to be either "first round lenders" or "second round lenders"
+```{r}
+
+all_top_loans <- nevada_ppp %>%
+  filter(lender %in% top_lenders$lender)   %>% 
+  group_by(lender, date_approved) %>%
+  summarise(n = n(),
+            sum = sum(amount)) 
+
+
+  
+all_top_loans %>%
+  ggplot +
+  geom_line(aes(x = date_approved, y = n, color = lender, alpha = 0.8)) + 
+  facet_wrap(~lender) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+```
+# 2020 PPP Loans
+```{r}
+
+
+nevada_loans_2020 <- nevada_ppp %>%
+  filter(date_approved < "2021-01-01") %>%
+  summarise(
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = mean(jobs_retained)
+            ) 
+
+nevada_loans_2020
+
+```
+# 2021 PPP Loans
+```{r}
+
+
+nevada_loans_2021 <- nevada_ppp %>%
+  filter(date_approved >= "2021-01-01") %>%
+  summarise(
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = mean(jobs_retained)
+            ) 
+
+nevada_loans_2021
+
+```
+# 2020's Top Lenders
+```{r}
+top_lenders_2020 <- nevada_ppp %>%
+  filter(date_approved < "2021-01-01") %>%
+  group_by(lender) %>%
+  summarise(n = n(),
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = median(jobs_retained)
+            ) %>%
+  arrange(desc(n)) %>%
+  head(10)
+  
+top_lenders_2020
+  
+```
+Compared to 2020, 2021 lenders seem to be far more focused on small businesses.  The top 10 lenders in 20201 approved more loans than the top lenders in 2020, but even though the median loan amaount is pretty similiar, the average loan is a lot smaller, likely a product fewer huge outlier loans.  The 2020 roud of loans also saved a lot more jobs on average.  2021's top lenders averaged about 1 job saved, indicating that this round was focused more on small businesses and sole-proprietors.
+# 2021's Top Lenders
+```{r}
+  
+  top_lenders_2021 <- nevada_ppp %>%
+  filter(date_approved > "2021-01-01") %>%
+  group_by(lender) %>%
+  summarise(n = n(),
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = median(jobs_retained)
+            ) %>%
+  arrange(desc(n)) %>%
+  head(10)
+
+
+top_lenders_2021
+
+
+```
+The different dynamics of each PPP cycle are even more clear when we use a line graph to examine total amount distributed.  
+
+2020 was a bang.  2021 was a trickle.  
+
+```{r}
+
+all_top_loans_2020 <- nevada_ppp %>%
+  filter(lender %in% top_lenders_2020$lender) %>% 
+  filter(date_approved < "2021-01-01") %>%
+  group_by(lender, date_approved) %>%
+  summarise(n = n(),
+            sum = sum(amount)) 
+
+
+  
+all_top_loans_2020 %>%
+  ggplot +
+  geom_line(aes(x = date_approved, y = sum, color = lender, alpha = 0.8)) + 
+  scale_y_continuous(labels=dollar_format()) + 
+  facet_wrap(~lender) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+```
+
+```{r}
+
+all_top_loans_2021 <- nevada_ppp %>%
+  filter(lender %in% top_lenders_2021$lender) %>% 
+  filter(date_approved >= "2021-01-01") %>%
+  group_by(lender, date_approved) %>%
+  summarise(n = n(),
+            sum = sum(amount)) 
+
+
+  
+all_top_loans_2021 %>%
+  ggplot +
+  geom_line(aes(x = date_approved, y = sum, color = lender, alpha = 0.8)) + 
+  scale_y_continuous(labels=dollar_format()) + 
+  facet_wrap(~lender) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+```
+## Itria Ventures
+
+Itria Ventures is one of the top small loaners in the dataset and [apparently one of the top small loaners in America](https://www.bankdirector.com/committees/lending/how-one-small-player-beat-out-pnc-wells-fargo-and-mt-for-ppp-loans/).  
+
+Its parent company Biz2Credit [came under scrutiny](https://www.nbcnews.com/business/economy/ftc-official-legal-loan-sharks-may-be-exploiting-coronavirus-squeeze-n1173346) early in the pandemic for aggressive legal actions against small businesses for non-payment of loans issued before the economic carnage of 2020.
+
+Ironically, it seems like Itria Ventures provided its loanees with very poor customer service.  I did some digging around on Reddit and it was NOT difficult to find distressed posts where users complained about not receiving their loans for months, receiving no status updates, and not being able to get in contact with customer service.  Users went as far as to post personal emails of Itria employees they had had success with.  
+
+```{r}
+
+include_graphics("images/itria_ventures_1.png")
+
+```
+
+```{r}
+
+include_graphics("images/itria_ventures_2.png")
+
+```
+```{r}
+
+include_graphics("images/itria_ventures_3.png")
+
+```
+```{r}
+
+include_graphics("images/itria_ventures_4.png")
+
+```
+
+```{r}
+
+include_graphics("images/itria_ventures_5.png")
+
+```
+
+Itria also came up when I looked for addresses with the most loans.  Itria sent over $1,000,000 a total of 48 businesses located at 304 S Jones BLVD in Las Vegas.  In total 304 S Jones BLVD as the address listed on 121 loans totaling over \$2 million.  
+
+```{r}
+
+nevada_ppp %>%
+  group_by(address) %>%
+  count(sort = T)
+
+nevada_ppp %>%
+  filter(address == "304 S Jones Blvd") %>%
+  group_by(servicing_lender_name) %>%
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            jobs_retained = sum(jobs_retained),
+            amount_per_job_retained = sum / jobs_retained,
+            most_common_industry = calculate_mode(title),
+            most_loaned_city = calculate_mode(city),
+            n = n())  %>%
+  arrange(desc(n))
+
+
+```
+
+## Undisbured Loans (This is actually pretty nuts)
+
+Only *ONE* Nevada PPP loan out of OVER 100,000!!
+
+This honestly seems pretty weird, but also it 
+```{r}
+undisbursed_loaners <- nevada_ppp %>%
+  group_by(lender) %>%
+  filter(undisbursed_amount > 0) %>%
+  summarise(n = n(),
+            total_loaned = sum(amount),
+            total_undisbursed = sum(undisbursed_amount),
+            median_loan = median(amount),
+            mean_loan = mean(amount),
+            loan_sum = sum(amount),
+            largest_loan = max(amount),
+            smallest_loan = min(amount),
+            avg_jobs_saved = mean(jobs_retained),
+            median_jobs_saved = mean(jobs_retained)
+            ) %>%
+  arrange(desc(n))
+
+
+undisbursed_loaners %>%
+  ggplot() +
+  geom_point(aes(x = total_loaned, y = total_undisbursed)) +
+  theme_minimal()
+  
+
+
+```
 
 
 ## Industry Analysis
 
 **Q4.** Write R code that examines industry patterns for PPP loans in your state, using the NAICS codes from the PPP data as a starting point. Generate statewide and county industry totals, then join that with 2018-19 data from the [Census County Business Patterns survey](https://www2.census.gov/programs-surveys/cbp/datasets/2019/cbp19co.zip) using 6-digit NAICS codes. The documentation explaining that data can be found here: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2018_record_layouts/county-layout-2018.txt. To do this, you will need to add FIPS codes to your PPP dataset.
 
+# How much did the US government spend indulging Americans' vices?
+
+Part of buoying Nevada's tourism industry is maintaining the businesses that Americans patronize to indulge their vices.  Bars, Hotel Casinos, Casinos, and the Cannabis industry are all pretty important parts of Nevada's economy.  
+
+In the next code chunk I'll examine loans to these industries.  How much did they get in total?  On average?  How efficiently did they spend their money?  How many jobs did they save.  
+
+```{r}
+
+
+nv_vices <- nevada_ppp %>%
+  group_by(title, naics_code) %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          avg_jobs_retained = mean(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum)  %>%
+  filter(naics_code == "722410" | naics_code == "721120" | naics_code == "713210" | naics_code == "713290" | naics_code == "711212")
+
+
+
+total_vice<- sum(nv_vices$sum) 
+
+nv_vices %>%
+  arrange(desc(sum))
+
+```
+
+```{r}
+dollar(total_vice)
+```
+# Over 250 MILLION DOLLARS!!!
+```{r}
+
+vice_or <- nevada_ppp %>%  
+  mutate(vice_or = case_when(naics_code == "722410" | naics_code == "721120" | naics_code == "713210" | naics_code == "713290" | naics_code == "711212" ~ "Vice",
+                             TRUE ~ title))
+
+
+
+```
+
+Taken together, drinking and gambling was the second most subsidized industry in the state behind restaurants.  Incredible stuff.
+```{r}
+
+  
+  
+vice_or_2 <- vice_or %>%   
+  group_by(vice_or) %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          avg_jobs_retained = mean(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum) %>%
+  mutate(is_vice = case_when(vice_or == "Vice" ~ "Drinkin' and Gamblin'",
+                             TRUE ~ "Neither Drinkin' nor Gamblin'")) %>%
+  arrange(desc(sum))
+
+vice_or_2
+
+
+
+```
+# Drinkin' and Gamblin'
+
+Incredible what a huge slice of Nevada's total PPP loans drinkin' and gamblin' represent
+```{r}
+
+vice_or_2 %>% 
+  head(10) %>%
+  filter(!is.na(vice_or)) %>%
+  ggplot() +
+  geom_col(aes(x = reorder(vice_or, sum), y = sum, fill = is_vice)) + 
+  scale_y_continuous(labels=dollar_format()) + 
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() +
+    theme(axis.title.x=element_blank(),
+        axis.text.x =element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(title = "NV's Top Industries")
+
+
+
+```
+# Casino-Hotels - Really Really Capital Intensive Apparently?
+One interesting thing I noticed here is Casino Hotels' relatively low payroll % relative to other jobs.  This kind of low-90s payroll percentage is more consistent with high overhead industries like manufacturing or other industries where it's important to have a lot of capital on hand.
+
+```{r}
+
+nv_vices[1,] %>%
+  select(title, payroll_pct)
+
+```
+
+```{r}
+
+nevada_ppp %>%
+  summarise(sum = sum(amount),
+            nv_avg_payroll_pct = sum(payroll_proceed, na.rm = T) / sum)
+```
+
+```{r}
+nevada_ppp %>%
+  group_by(title, naics_code) %>%
+  summarise(sum = sum(amount),
+            payroll_pct = sum(payroll_proceed, na.rm = T) / sum) %>%
+  filter(sum > 2000000) %>%
+    arrange(payroll_pct)
+
+
+
+```
+## Now, Some Sports:
+
+Noticed a thing while I was going through the last excercise.  Floyd "MONEY" Mayweeather's boxing promotion company got a pretty large PPP loan.  The latter of their loans was also forgiven in part.
+
+Decided to do a quick check to  see if other boxing promotions had also received loans.  
+
+```{r}
+mayweather <- nevada_ppp %>%
+  filter(str_detect(name, "MAYWEATHER PROMO"))
+
+mayweather %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum) 
+
+```
+
+
+```{r}
+boxing_and_sports <- nevada_ppp %>%
+  filter(title == "Promoters of Performing Arts, Sports, and Similar Events without Facilities" | title == "Promoters of Performing Arts, Sports, and Similar Events with Facilities") %>% 
+  group_by(name) %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum) %>%
+  arrange(desc(sum))
+
+boxing_and_sports %>%
+  arrange(desc(sum))
+
+```
+And the answer is actually yes!  Top Rank Promotions, the promotions company Bob Arum and Muhammad Ali started received two rounds of PPP loans as well
+```{r}
+
+top_rank <- nevada_ppp %>%
+  filter(str_detect(name, "TOP RANK INC")) 
+
+
+top_rank %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum) 
+
+```
+
+## Some other interesting ones:
+
+The holding company that owns the Las Vegas Golden Knights.  
+
+```{r}
+golden_knights <- nevada_ppp %>%
+  filter(str_detect(name, "BLACK KNIGHT")) 
+
+golden_knights %>% 
+  summarise(sum = sum(amount),
+          median = median(amount),
+          mean = mean(amount),
+          n = n(),
+          amount_per_job = sum / sum(jobs_retained),
+          total_jobs_retained = sum(jobs_retained),
+          payroll_pct = sum(payroll_proceed) / sum) 
+
+```
+
 Does the distribution of PPP applications by the top 10 industries (by number of applications) roughly match the number of businesses reported in the Census data? Does it roughly match if you remove self-employed individuals and sole proprietorships from the PPP totals? Write up a summary of what you've found and whether there are potentially newsworthy patterns in the data.
 
 Create a county-level map showing the differences between the PPP applications and the Census business data for one of the top 10 industry codes. You can do this either using ggplot or Datawrapper (if the latter, publish that map and include the URL below).
 
+
 **A4.** 
 
+
+```{r}
+census_jobs <- "https://www2.census.gov/programs-surveys/cbp/datasets/2019/cbp19co.zip"
+
+unzip("data/cbp19co.zip", exdir = "data/")
+
+census_jobs <- read_csv("data/cbp19co.txt")
+
+nv_census_jobs <- census_jobs %>%
+  filter(fipstate == 32) %>%
+  rename(naics_code = naics) %>%
+  left_join(naics_codes_2, by = "naics_code") %>% 
+  select(naics_code, title, est, ap, fipscty) %>%
+  filter(!is.na(title)) %>%
+  arrange(desc(ap))
+
+nv_fips <- fips_codes %>%
+  filter(state_code == 32) %>%
+  mutate(project_county_name = toupper(str_remove_all(county, " County"))) %>%
+  rename(fipscty = county_code,
+         fipstate = state_code) %>%
+  select(fipstate , fipscty, project_county_name)
+```
+# Census Business Data
+```{r}
+census_naics <- nv_census_jobs %>%
+  left_join(nv_fips, by = "fipscty") %>%
+  group_by(title) 
+
+census_rr_naics <- nv_census_jobs %>%
+  left_join(nv_fips, by = "fipscty") %>%
+  filter(title  == "Full-Service Restaurants") %>%
+  group_by(fipscty) %>%
+  summarise(total_bus = sum(est)) %>%
+  arrange(desc(total_bus))
+
+census_rr_county <- census_rr_naics %>%
+  left_join(nv_fips, by = "fipscty")
+
+
+
+  
+
+
+census_top_naics <- nv_census_jobs %>%
+  left_join(nv_fips, by = "fipscty") %>%
+  group_by(title) %>%
+  summarise(total_bus = sum(est)) %>%
+  arrange(desc(total_bus))
+
+census_top_naics
+
+```
+# PPP Applications
+```{r}
+nevada_ppp %>%
+  group_by(title) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  filter(!is.na(title))
+```
+# Removing Individuals
+Pretty close actually.  Top 5 are basically the same.  Restaurant PPP applications are within 200 of the number of restaurants estimated by the Census business data
+```{r}
+nevada_ppp_top_naics <- nevada_ppp %>%
+  filter(jobs_retained > 1) %>%
+  group_by(title) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  filter(!is.na(title))
+
+nevada_ppp_top_naics
+```
+# Lets Map 
+
+Restaurants is a pretty solid example 
+
+```{r}
+nevada_ppp %>% 
+  left_join(census_naics, by = "project_county_name")
+
+rr_summary <- nevada_ppp %>% 
+  filter(project_state == "NV") %>%
+  filter(title  == "Full-Service Restaurants") %>%
+  group_by(project_county_name) %>% 
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            n = n()) %>%
+  mutate(n = as.double(n)) %>%
+  arrange(desc(n)) %>%
+  ungroup() %>%
+  left_join(census_rr_county) %>%
+  mutate(diff = n - total_bus) %>%
+  left_join(nv_county_pop, by = "project_county_name")
+
+
+
+
+rr_summary 
+
+rr_map <- rr_summary %>%
+  filter(!is.na(geometry)) %>%
+  ggplot() +
+  geom_sf(aes(fill=diff, geometry = geometry)) +
+  geom_sf_text(data = county_summary, 
+               aes(label = project_county_name, geometry = geometry), 
+               size = 2.2, colour = "black") +
+  scale_fill_distiller(palette = "YlOrBr",breaks = c(0, 10000, 20000), labels=comma_format()) +
+  theme_void()
+
+rr_map
+
+
+```
 ## Summary
 
 **Q5.** What is the most promising story idea that you have found during this exploration? How would you approach reporting it out and what other information/data would you need to do that? What would be the minimum story you could get from this, and what would be the maximum story?
 
 **A5.**
+
+I'd like to do some more digging into Itria Ventures.  Since 2021, they've been targeted for a [class action lawsuit](https://www.classaction.org/news/itria-ventures-hit-with-class-action-over-allegedly-shady-money-lending-based-on-future-receivables) (that has since been dismissed)
+
+They seem like a classic case of a fintech with a lot of capacity and comparatively little in terms of people infrastructure (customer service, quality control, etc).  They were extremely during the pandemic aggressive both in making loans and taking actions agains those they chose to loan to.  
+
+
+The fact that the data isn't anonymized provides a fantastic opening for doing reporting on Itria ventures.  I can even produce some summary findings quickly here.
+
+# Who do they loan to?
+Itria mostly loaned to 1 person businesses.  A vast majority of their loans went to sole proprietors, independent contractors, or the self-employed 
+
+```{r}
+
+nevada_ppp %>%
+  filter(str_detect(servicing_lender_name,"Itria")) %>%
+  group_by(business_type) %>%
+  count(sort = T)
+
+
+
+```
+
+## How Much Do They Loan?
+Itria, as expected, gives out pretty small loans.  Their median loan was about $20,000
+```{r}
+
+nevada_ppp %>%
+  filter(str_detect(servicing_lender_name,"Itria")) %>%
+  group_by(servicing_lender_name) %>%
+  summarise(sum = sum(amount),
+            median = median(amount),
+            mean = mean(amount),
+            jobs_retained = sum(jobs_retained),
+            amount_per_job_retained = sum / jobs_retained,
+            most_common_industry = calculate_mode(title),
+            most_loaned_city = calculate_mode(city),
+            n = n())
+
+
+```
+
+## What kinds of businesses are they loaning to?
+The kinds of businesses Itria loans to is reflective of the fact that they mostly loan to one-person businesses.  
+
+This puts those Reddit comments from earlier into clearer focus.  The kind of people Itria loans to were sometimes solely relying on the speed of Itria's loan processing to feed their families, stay out of severe, high-interest, debt, and take care of their responsibilities.  
+
+Even more broadly than just Itria, I'd be interested in which lenders took the longest to process loans on average.  
+```{r}
+nevada_ppp %>%
+  filter(str_detect(servicing_lender_name,"Itria")) %>%
+  group_by(title) %>%
+  count(sort = T)
+```
+
+## How Would I Report This?
+
+It would be reaaaaaaaally nice to find a matching dataset with a value for "date_processed".  From there it would be a matter of minutes until I had an answer to my question.  I think it's probably worth it to FOIA for this and see if it exists.  
+
+It would also be helpful to find anecdotal examples of long waits for loans materially affected people.  Did anyone's family go hungry?  Did anyone lose their business?  
+
+I think the minimum story looks something like the NBC piece linked above, and the max story is detailed breakdown of how efficient major lenders were in disbursing loans during one of the most crucial times in history.  
