@@ -14,6 +14,8 @@ library(rvest)
 library(glue)
 library(purrr)
 library(tibble)
+library(stringr)
+library(stringi)
 ```
 ## Okay What Do I Do?
 
@@ -86,8 +88,39 @@ Third, there's still some work to be done standardizing the field.  Some jobs ar
 
 Anyways, I think I'm off to a good start here and the work this week will mostly revolve around refining the scraping function and then hopefully jumping into some analysis
 
-```{r}
+# Kind of a bummer: On the scraper 
+I was hopeful at first when I saw that marvel and DC wikia both had standarized website layouts with a lot of scrapable nodes.  
 
+However, I quickly ran into some problems that dragged this thing down just a little.  I'll attempt to explain each and what I did to mitigate.  
+
+## Where is the job?
+
+As you can probably tell from the scrapers below, the "occupation" section of the Marvel Wikia and the corresponding section on DC wikia generally appeared on differently named nodes.  This was among the first red flags in the data and suggested to me immediately that I would not be able to get job data for everyone.  From there it didn't take me too long to run into problem #2
+
+## Is Job location the same for every character?
+
+Sadly no.  While the location for the occupation node is *generally* in the same place, that is not universally the case.  Trying different nodes also had diminishing returns as it required more and more work for fewer and fewer correct matches.  It also became clear after some testing that not every character even had an occupation field on either site 
+
+## How many characters even have jobs?
+
+This is the unknowable question whose spector haunts this project for me.  Some characters (a character with only a few appearances especially) will often not have jobs.  Maybe their job wasn't relevant for the story.  Maybe we didn't follow them long enough in the story to see their work.  But their occupation node is totally empty.  
+
+The problem for me is there's no way of knowing whether I am missing the occupation node for a character because they do not have an occupation or because I got the node wrong.  Functionally there is no difference, but I wish I had a way of working around this.  
+
+
+## My computer's processing power limits 
+Sigh.  Scraping Marvel wikia is hard.  And I only have one computer.  As a result I was only able to scrape the first 5000 results of the Marvel dataframe.  This one is on me and I fee
+
+## Where I landed
+
+Ultimately I decided to analyze smaller subset of the data for this project.  It contains job data for about 2,500 characters in the data.  This is a little over 10% of the total characters in the data but a much larger percentage of total appearances, allowing me to justify it to myself as a representative sample.  In any case it's too late to turn back now so I will do my best.  
+
+
+```{r}
+# Scraper is below but I'm going to save you seome time and include the rds 
+
+readRDS(gdxg, "data/gdxg.rds")
+readRDS(gdxg_marvel, "data/gdxg_marvel.rds")
 page<- (dc_test$full_url)
 
 
@@ -104,21 +137,60 @@ gdxg <- lapply(page, function(i) {
 })
 
 
+gdxg_marvel <- future_map(page_marvel, function(i) {
+  
+  tryCatch(
+    i %>%
+      read_html %>%
+      html_nodes(".pi-collapse:nth-child(10) .pi-border-color:nth-child(4) .pi-font") %>% 
+      html_text(),
+    error = function(e){NA}  
+  )
+})
+
+gdxg_marvel[lengths(gdxg) == 0] <- NA_character_
 gdxg[lengths(gdxg) == 0] <- NA_character_
 
 hero_jobs_test <- unlist(gdxg)
+test_list_marvel <- lapply(gdxg_marvel, function(x) if(identical(x, character(0))) NA_character_ else x)
+
+marvel_job_test <- test_list_marvel %>%
+  unlist()
 
 dc_data$job <- hero_jobs_test
+marvel_5000 <- marvel_data[1:5000,]
+
+marvel_5000$job <- marvel_job_test
+
+marvel_5000$universe <- "Marvel"
+dc_data$universe <- "DC"
 
 hero_jobs_test
 
+```
 
-jobs_test <- dc_data %>% 
+```{r}
+jobs_test_dc <- dc_data %>% 
   mutate(job = str_to_upper(job)) %>%
   mutate(job = case_when(job == "MARRIED" ~ NA_character_,
                          job == "SINGLE" ~ NA_character_,
                          job == "WIDOWED" ~ NA_character_,
                          job == "DIVORCED" ~ NA_character_,
+                         job == "MOBILE" ~ NA_character_,
+                         TRUE ~ job),
+         married = case_when(job == "MARRIED" ~ "MARRIED",
+                         job == "SINGLE" ~ "SINGLE",
+                         job == "WIDOWED" ~ "WIDOWED",
+                         job == "DIVORCED" ~ "DIVORCED",
+                         TRUE ~ NA_character_))
+
+jobs_test_marvel <- marvel_5000 %>% 
+  mutate(job = str_to_upper(job)) %>%
+  mutate(job = case_when(job == "MARRIED" ~ NA_character_,
+                         job == "SINGLE" ~ NA_character_,
+                         job == "WIDOWED" ~ NA_character_,
+                         job == "DIVORCED" ~ NA_character_,
+                         job == "MOBILE" ~ NA_character_,
                          TRUE ~ job),
          married = case_when(job == "MARRIED" ~ "MARRIED",
                          job == "SINGLE" ~ "SINGLE",
@@ -127,6 +199,181 @@ jobs_test <- dc_data %>%
                          TRUE ~ NA_character_))
 
 
+
+```
+# Good vs Bad
+First interesting thing to me is there are way more bad characters than good characters in the data.  The Marvel universe is especially lopsided 
+
+I think that's probably down to villains being more dime-a-dozen than heroes.  Bad characters are necessary because conflict moves the story forward.  
+
+It might also bore readers if their heroes were encountering the same opposition in every issue.  
+
+Simply put, there's a reason why the comic is called "Spider-Man" and not "Green Goblin".  
+```{r}
+
+good_v_bad_marvel <- marvel_data %>%
+  group_by(ALIGN) %>% 
+  filter(!is.na(ALIGN)) %>%
+  count(sort = T) %>%
+  mutate(universe = "Marvel")
+
+good_v_bad_dc <-dc_data %>%
+  group_by(ALIGN) %>% 
+  filter(!is.na(ALIGN)) %>%
+  count(sort = T,) %>%
+  mutate(universe = "DC")
+
+good_v_bad <- good_v_bad_marvel %>%
+  full_join(good_v_bad_dc)
+
+
+
+good_v_bad <- good_v_bad %>%
+  group_by(ALIGN) %>%
+  filter(ALIGN != "Reformed Criminals")
+
+
+
+ggplot(good_v_bad, aes(fill=universe, y=n, x=ALIGN)) + 
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_manual(values=c("#0476F2", "#F0131E")) +
+  theme_minimal()
+
+```
+#When were characters created?  
+
+One thing I've been super interested in are the most prolific eras of character creation.  It seems like we live with an annoying amount of comic book content in this day and age, but is this truly the golden age of comic book characters?
+
+
+```{r}
+marvel_data$job <- NA_character_
+
+marvel_data$universe <- "Marvel"
+dc_data$universe <- "DC"
+
+dc_data <- dc_data %>%
+  rename(Year = YEAR)
+
+comic_data<-full_join(marvel_data, dc_data) 
+
+
+
+comic_years <- comic_data %>%
+  filter(!is.na(Year)) %>%
+  group_by(Year) %>%
+  summarise(n = n(),
+          apps = sum(APPEARANCES, na.rm = T),
+          apps_per_character = apps / n) %>%
+  arrange(desc(n)) 
+
+comic_years
+```
+
+```{r}
+
+comic_years %>%
+  ggplot + 
+  geom_line(aes(x = Year, y = n)) +
+  theme_minimal()
+
+
+
+```
+## What were the most important years in comic book history?
+It's one thing to examine raw numbers of comic book characters being created at a given time, but there are arguably too many variables to draw many meaningful conclusions.  For example, comic book characters are in a golden age and we are currently creating fewer new characters than at any point in about 50 years.  Conversely, comic book creators may be incentivized to throw a lot of ideas at the wall during times when business is bad, like the early 90s.  
+
+I'll attempt to take a more sophisticated approach to calculating most impactful years in comic book history: appearances per character.  This will hopefully do a much better job at measuring the efficiency with which artists were albe to create classic characcters at a given time 
+
+## Some problems with this approach
+
+It's going to be biased against newer characters.  It just is unfortunately.  If 
+
+## Results 
+Muuuuuch different story here.  And a very interesting story.
+
+Comic book creators were incredibly efficient in the late 1930s and early 1940s.  Though they created a similar number of new characters as today's artists, characters from that era average more appearances per character created in the same year.  
+
+Likewise, the 1960s, another notable era of national anxiety was another golden era in efficiency.  
+
+By contrast, the 90s was full of duds despite being one of the most prolific eras of character creation in the data.  
+```{r}
+comic_years %>%
+  ggplot + 
+  geom_line(aes(x = Year, y = apps_per_character)) +
+  theme_minimal() +
+  labs(y_axis = "Appearances Per Character")
+
+```
+
+```{r}
+
+comic_years_marvel <- comic_data %>%
+  filter(universe == "Marvel") %>%
+  filter(!is.na(Year)) %>%
+  group_by(Year) %>%
+  summarise(n = n(),
+            apps = sum(APPEARANCES, na.rm = T),
+          apps_per_character = apps / n,
+          universe = "Marvel") %>%
+  arrange(desc(n)) 
+
+  
+comic_years_dc <- comic_data %>%
+  filter(universe == "DC") %>%
+  filter(!is.na(Year)) %>%
+  group_by(Year) %>%
+  summarise(n = n(),
+          apps = sum(APPEARANCES, na.rm = T),
+          apps_per_character = apps / n,
+          universe = "DC") %>%
+  arrange(desc(n)) 
+
+
+comic_data %>%
+  filter(universe == "DC") %>%
+  select(Year)
+
+```
+
+# When Were character Created by Alginment?
+
+A few notes on this.
+
+It seems that the 90s character creation boom was driven in large part by an explosion of new "Bad character".  
+
+There's been a strong rise in neutral characters combined with a sharp decrease in the creation of both "good" and "bad" characters in recent years.  This suggests comic books are creating more complicated, morally ambiguous characters who operate in more grey areas.  
+```{r}
+good_v_bad_years <- comic_data %>%
+  filter(!is.na(Year)) %>%
+  filter(!is.na(ALIGN)) %>%
+  group_by(Year, ALIGN) %>%
+  summarise(n = n(),
+            apps = sum(APPEARANCES, na.rm = T),
+          apps_per_character = apps / n) %>%
+  arrange(desc(n)) 
+
+good_v_bad_years
+```
+
+```{r}
+good_v_bad_years %>%
+  ggplot + 
+  geom_line(aes(x = Year, y = n, color = ALIGN)) +
+    theme_minimal() 
+
+```
+# lets look at efficiency 
+
+This graph is the clearest evidence yet of "bad characters'" poor staying power relative to "good" and "neutal" characters.  "Bad character" appeaarances per character has only eclipsed 50 once in history, where "good" and "neutral" characters tend to fare far better.  
+```{r}
+good_v_bad_years %>%
+  ggplot + 
+  geom_line(aes(x = Year, y = apps_per_character, color = ALIGN)) +
+    theme_minimal() 
+
+```
+
+```{r}
 jobs_test %>%
   mutate(job_yes = case_when(!is.na(job) ~ "has job",
                              is.na(job) ~ "no job",
@@ -173,28 +420,12 @@ hero_jobs_test2
 ```
 # The Hero Economy
 What are the most common jobs among comic book characters?
+
+Going to start with a simple count.
+
+At first glance it looks okay.  But unfortunately this actually doesn't shrink the df by that much.  That's because a bunch of characters have multiple or former jobs listed on the wikia.  My next mission is figuring a way around this 
 ```{r}
-
-most_common_jobs <- jobs_test %>%
-  filter(!is.na(job)) %>%
-  group_by(job) %>%
-  count(sort = T) %>%
-  head(20)
-
-most_common_jobs
-
-least_common_jobs <- jobs_test %>%
-  filter(!is.na(job)) %>%
-  group_by(job) %>%
-  count(sort = T) %>%
-  tail(20)
-```
-
-What are the most common jobs among "good characters" and "bad characters"
-
-Most interesting thing to me here is 'good character' are a lot less defined by their jobs.  'Bad characters' mostly do crime full-time.  While the method of crime might change (e.g. 'mobster', 'terrorist','crimelord') most 'bad character' jobs are defined by doing crime and/or violence.  
-```{r}
-most_common_jobs_heroes <- jobs_test %>%
+most_common_jobs_heroes <- comic_jobs %>%
   filter(!is.na(job),
          ALIGN == "Good Characters") %>%
   group_by(job) %>%
@@ -203,7 +434,7 @@ most_common_jobs_heroes <- jobs_test %>%
 
 most_common_jobs_heroes
 
-most_common_jobs_villains <- jobs_test %>%
+most_common_jobs_villains <- comic_jobs %>%
   filter(!is.na(job),
          ALIGN == "Bad Characters") %>%
   group_by(job) %>%
@@ -214,82 +445,218 @@ most_common_jobs_villains
 
 
 ```
-
-# Hard Workers 
-how often do commic book characters have multiple jobs ?
 ```{r}
-jobs_test %>%
-  filter(!is.na(job)) %>%
-  mutate(job = str_replace_all(job,"·", ",")) %>%
-  mutate(n_jobs = case_when(str_count(job, ",") == 0 ~ "1",
-                            str_count(job, ",") == 1 ~ "2",
-                            str_count(job, ",") == 2 ~ "3",
-                            str_count(job, ",") == 3 ~ "4",
-                            str_count(job, ",") == 4 ~ "5",
-                            TRUE ~ NA_character_
-                            )) %>%
-  select(name, job, n_jobs, ALIGN) %>%
-  group_by(n_jobs) %>%
+
+comic_jobs <- full_join(jobs_test_dc, jobs_test_marvel)
+
+
+comic_jobs %>% 
+  filter(!is.na(job)) %>% 
+  mutate(job = str_replace_all(job, "; | · |;|·",",")) %>%
+  group_by(job) %>%
   count(sort = T)
 
-multi_job_characters <-   jobs_test %>%
-  filter(!is.na(job)) %>%
-  mutate(job = str_replace_all(job,"·", ",")) %>%
-  mutate(n_jobs = case_when(str_count(job, ",") == 0 ~ "1",
-                            str_count(job, ",") == 1 ~ "2",
-                            str_count(job, ",") == 2 ~ "3",
-                            str_count(job, ",") == 3 ~ "4",
-                            str_count(job, ",") == 4 ~ "5",
-                            TRUE ~ NA_character_
-                            )) %>%
-  mutate(n_jobs = as.double(n_jobs)) %>%
-  select(name, job, n_jobs, ALIGN) %>%
-  filter(n_jobs > 1)
+```
+# Figuring a Way Around This 
 
+Okay so I think the best way to do this is to make a giant character vector with all the jobs, standardize the punctuation within the columns (I want all jobs to be separated by a comma), splitting on a comma, and turning the resulting vector into a dataframe that I can then count.
 
+## In practice...not so simple 
 
+Okay So the first problem I'm having is removing trailing whitespace that is creating some duplicates.  Tried several solutions to this but none of them seem to be working through mutating.  I'll try another approach below 
+```{r}
+jobs <- table(unlist(strsplit(as.character(comic_jobs$job), ','))) %>%
+  as.data.frame() 
 
-
-
+jobs %>%
+  mutate(job = str_trim(Var1, side = c("both", "left", "right"))) %>%
+  select(job, Freq) %>%
+  arrange(desc(Freq))
 
 ```
 
-# Job Analysis 
+## Another Approach 
+
+There's probably a way around this using "str_replace_all" but I couldn't find it so I decided that I will place jobs into broad categories based on "str_detect" rather than trying to standarize each individual "job" value.
+
+This is in a way unfortunate because there's no way I'll be able to capture all of the different kinds of jobs in one industry (for example, how can I be sure I have captured all the different types of law enforcement), but it's better for my sanity
+
+
+# "Good" Jobs and "Bad" jobs
+What are the most common jobs among "good characters" and "bad characters"
 
 Jobs often act as a way to signal a character's morality.  There are certain jobs in our society that are more associated with 'good' or 'bad' behavior and writers take advantage of this for exposition.
 
-Case in point -- Police officer characters:
-```{r}
+Most interesting thing to me here is 'good character' are a lot less defined by their jobs.  'Bad characters' mostly do crime full-time.  While the method of crime might change (e.g. 'mobster', 'terrorist','crimelord') most 'bad character' jobs are defined by doing crime and/or violence. 
 
-jobs_test %>%
-  group_by(job) %>%
-  filter(job == "POLICE OFFICER") %>%
+
+Case in point -- Police officer characters vs criminal characters:
+```{r}
+#Police
+comic_jobs %>%
+  group_by(ALIGN) %>%
+  filter(str_detect(job,"POLICE OFFICER"))%>%
   count(ALIGN, sort = T)
 
-jobs_test %>%
-  group_by(job) %>%
-  filter(job == "CRIMINAL") %>%
+#Criminals 
+comic_jobs %>%
+  group_by(ALIGN) %>%
+  filter(str_detect(job, "CRIMINAL")) %>%
   count(ALIGN, sort = T)
 
 
 ```
 
-Not everything is black and white though.  For example, scientist
+# Job titles often still carry the same political connotations and baggage as they do in real life
+
+Case in point "Freedom Fights" vs. "Terrorists"
 
 ```{r}
-jobs_test %>%
-  group_by(job) %>%
-  filter(job == "SCIENTIST") %>%
-  count(ALIGN, sort = T)
+
+comic_jobs %>%
+  filter(str_detect(job, "FREEDOM FIGHTER")) %>% 
+  group_by(ALIGN) %>%
+  count()
+
+comic_jobs %>%
+  filter(str_detect(job, "TERRORIST")) %>% 
+  group_by(ALIGN) %>%
+  count()
+
+
+```
+
+## Journalists
+Comics have always held journlists in high regard.  Journalists are almost univerally good characters a few comic book journalists are among the characters with the most appearances
+```{r}
+
+comic_jobs %>%
+  filter(str_detect(job, "REPORTER|JOURNALIST|ANCHOR")) %>% 
+  group_by(ALIGN) %>%
+  count(sort = T)
+
+comic_jobs %>%
+  filter(str_detect(job, "REPORTER|JOURNALIST|ANCHOR")) %>%
+  arrange(desc(APPEARANCES))
+
+
+```
+
+# A more detailed look
+
+Here I'd like to do some analysis of job categories more broadly, how those job categories break down 'good character' vs. 'bad character' and also Marvel vs. DC
+
+### Law Enforcement 
+We took a brief look at this above, but it's worth a deeper dive.  
+
+Law enforcement's role in comics is often partnering with the hero, representing a moral base and the rule of law.  They are important because they often legitimize comic book heroes' vigilante violence by following it up with legitimate legal action.  
+
+For this category, I'll include all police officers, detectivs, government agents, and soldiers,
+
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "POLICE OFFICER|DETECTIVE|GOVERNMENT AGENT|SOLDIER")) %>% 
+  group_by(ALIGN) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot() +
+  geom_col(aes(x = reorder(ALIGN, desc(n)), y = n, fill = ALIGN)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
+           
+
+```
+
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "POLICE OFFICER|DETECTIVE|GOVERNMENT AGENT|SOLDIER")) %>% 
+  group_by(ALIGN, universe) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot(aes(fill=ALIGN, y=n, x=reorder(universe, -n))) +
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
 
 
 
 ```
 
-# Next stop, perform this analysis at scale and do some more data viz
+# Bussiness and Executives
+Interesting to me that businessmen and executives are mostly good.  
 
-I think the 'story' element of this project will mostly hinge of the kind of job analysis I perform above, but I'd also like to add a little more sophistication in a few ways 
+Some fun
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "BUSINESSMAN|CEO|EXECUTIVE|MILLIONAIRE|BILLIONAIRE")) %>% 
+  group_by(job) %>%
+  count(sort = T) 
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed"))
 
-1) more data viz.  I'm thinking I'm going to display my job analysis as a series of stacked bar charts.  Would be a much more efficient way of displaying that info.  Also planning on adding a timeline showing the prevalence of different types of jobs by year/decade.  The hangup there is creating neat job categories to fit as many of the hundreds of unique jobs in the data as I can.  
 
-2) Scale.  I want to see if I can wring a higher number of dc character jobs from that data set.  I also need to try to run the same kind of scraper on marvel wikia to produce results for marvel characters so I can compare the two.  I think I could produce viable analysis with the near 2,000 characters I do have job data on, but more would certainly be better especially because it will allow me to compare two different comic book companies. 
+
+comic_jobs %>%
+  filter(str_detect(job, "BUSINESSMAN|CEO|EXECUTIVE|MILLIONAIRE|BILLIONAIRE")) %>% 
+  group_by(ALIGN) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot() +
+  geom_col(aes(x = reorder(ALIGN, desc(n)), y = n, fill = ALIGN)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
+
+
+```
+
+A larger percentage of Business oriented DC characters are 'Bad' compared to their Marvel counterparts.  This suggests DC has generally has a more negative view of business and what it represents than Marvel.  
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "BUSINESSMAN|CEO|EXECUTIVE|MILLIONAIRE|BILLIONAIRE")) %>% 
+  group_by(ALIGN, universe) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot(aes(fill=ALIGN, y=n, x=reorder(universe, -n))) +
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
+
+
+
+```
+
+# Scientists and Engineers 
+Science and scientists play an interesting role in comics.  On one hand, comic books seem to understand generally the importance of science.  On the other, they view it also as mysterious and dangerous.  The mad scientist trope distills this dichotomy into a character type.  
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "SCIENTIST|CHEMIST|BIOLOGIST|ZOOLOGIST|ENGINEER")) %>% 
+  group_by(ALIGN) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot() +
+  geom_col(aes(x = reorder(ALIGN, desc(n)), y = n, fill = ALIGN)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
+
+```
+```{r}
+comic_jobs %>%
+  filter(str_detect(job, "SCIENTIST|CHEMIST|BIOLOGIST|ZOOLOGIST|ENGINEER")) %>% 
+  group_by(ALIGN, universe) %>%
+  count(sort = T) %>%
+  filter(!is.na(ALIGN)) %>%
+  filter(!str_detect(ALIGN, "Reformed")) %>%
+  ggplot(aes(fill=ALIGN, y=n, x=reorder(universe, -n))) +
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal()
+
+
+
+```
+
