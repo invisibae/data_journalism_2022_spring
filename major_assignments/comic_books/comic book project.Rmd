@@ -660,3 +660,9 @@ comic_jobs %>%
 
 ```
 
+# Conclusions 
+
+Truth be told, I don't know if I came out of this learning too much more about comics.  The two comic book companies had pretty similar rations of good/bad/neutral for the different types of jobs and there wasn't much controversy in terms of how each job was characterized.
+
+To the extent that there is a takeaway I think it is this: comic books are a reflection of our society.  One of the most interesting takeaways from this project for me is that comic book companies seem to have given up on creating new, prolific characters.  The lack of new IP and the heavy reliance on older properties is in line with what is going on with media at large.  
+
