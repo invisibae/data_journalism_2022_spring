@@ -1,0 +1,55 @@
+---
+title: "Class Reference"
+author: "Derek Willis"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+print("Hello puppy!")
+```
+
+## Introduction
+
+Consider this a personal guide to the commands and functions you will learn. In general, when you come across an R command or function that you want to remember, put it in here along with a description of what it does and when you'd use it.
+
+### How to set the working directory
+
+The command to set a working directory is setwd(). For example:
+
+```{r}
+setwd("~/jour472/data_journalism_2023_fall")
+```
+
+### How to install and load the tidyverse
+
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+### How to read in a CSV file from the Internet
+
+```{r}
+wes_moore_contributions <- read_csv("https://raw.githubusercontent.com/stephenneukam/CNS_Annapolis/main/Campaign_finance/Moore_ContributionsList.csv")
+```
+
+### How to count rows
+
+You use the `n()` function to count rows, like so:
+
+```{r}
+dataframe %>% 
+  group_by(some_column) %>% 
+  summarize(count = n())
+```
